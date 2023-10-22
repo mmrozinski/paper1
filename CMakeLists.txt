@@ -3,7 +3,14 @@ project(paper1)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(paper1 main.cpp)
+add_executable(paper1 main.cpp
+        Camera.cpp
+        Camera.h
+        Vector3.cpp
+        Vector3.h
+        Matrix4.cpp
+        Matrix4.h
+)
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)

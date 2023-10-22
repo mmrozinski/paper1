@@ -1,0 +1,28 @@
+//
+// Created by Makel on 10/22/2023.
+//
+
+#include "Camera.h"
+
+
+Camera::Camera(Vector3 position, float aspectRatio) {
+
+}
+
+void Camera::updateVectors() {
+    _front.x = cosf(_pitch) * cosf(_yaw);
+    _front.y = sinf(_pitch);
+    _front.z = cosf(_pitch) * sinf(_yaw);
+
+    _front = Vector3::normalize(_front);
+    _right = Vector3::normalize(_right);
+    _up = Vector3::normalize(_up);
+}
+
+Matrix4 Camera::getViewMatrix() const {
+    return Matrix4::lookAt(_position, _position + _front, _up);
+}
+
+Matrix4 Camera::getProjectionMatrix() const {
+    return Matrix4::createPerspectiveFieldOfView(_fov, _aspectRatio, 0.01f, 100.0f);
+}
