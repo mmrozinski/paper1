@@ -1,7 +1,3 @@
-//
-// Created by Makel on 10/22/2023.
-//
-
 #ifndef PAPER1_CAMERA_H
 #define PAPER1_CAMERA_H
 

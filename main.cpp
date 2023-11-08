@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <iostream>
 
@@ -51,7 +52,7 @@ void initGLUT(int *argc, char **argv) {
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 
     glutInitWindowSize(800, 600);
-    glutCreateWindow("Bartke");
+    glutCreateWindow("nice squares");
 
     glutDisplayFunc(handleDisplay);
     glutKeyboardFunc(handleKeyboardInput);
@@ -60,6 +61,10 @@ void initGLUT(int *argc, char **argv) {
 
 int main(int argc, char **argv) {
     initGLUT(&argc, argv);
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+    }
 
     glutMainLoop();
 

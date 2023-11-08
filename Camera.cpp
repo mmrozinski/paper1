@@ -1,12 +1,9 @@
-//
-// Created by Makel on 10/22/2023.
-//
-
 #include "Camera.h"
 
 
 Camera::Camera(Vector3 position, float aspectRatio) {
-
+    _position = position;
+    _aspectRatio = aspectRatio;
 }
 
 void Camera::updateVectors() {

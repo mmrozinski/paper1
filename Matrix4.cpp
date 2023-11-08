@@ -1,8 +1,20 @@
-//
-// Created by Makel on 10/22/2023.
-//
-
 #include "Matrix4.h"
+
+Matrix4::Matrix4() {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            _values[i][j] = 0;
+        }
+    }
+}
+
+Matrix4::Matrix4(float (*values)[4]) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            _values[i][j] = values[i][j];
+        }
+    }
+}
 
 Matrix4::Matrix4(const Matrix4 &matrix) {
     for (int i = 0; i < 4; i++) {
@@ -10,6 +22,15 @@ Matrix4::Matrix4(const Matrix4 &matrix) {
             _values[i][j] = matrix._values[i][j];
         }
     }
+}
+
+Matrix4 Matrix4::createIdentity() {
+    float v[4][4] = {{1.0f, 0.0f, 0.0f, 0.0f},
+                     {0.0f, 1.0f, 0.0f, 0.0f},
+                     {0.0f, 0.0f, 1.0f, 0.0f},
+                     {0.0f, 0.0f, 1.0f, 0.0f}};
+
+    return Matrix4(v);
 }
 
 Matrix4 Matrix4::lookAt(Vector3 eye, Vector3 target, Vector3 up) {
@@ -27,12 +48,12 @@ Matrix4 Matrix4::lookAt(Vector3 eye, Vector3 target, Vector3 up) {
     result._values[0][1] = yVec.x;
     result._values[1][1] = yVec.y;
     result._values[2][1] = yVec.z;
-    result._values[3][1] = -Vector3::dot(yVec,eye);
+    result._values[3][1] = -Vector3::dot(yVec, eye);
 
     result._values[0][2] = zVec.x;
     result._values[1][2] = zVec.y;
     result._values[2][2] = zVec.z;
-    result._values[3][2] = -Vector3::dot(zVec,eye);
+    result._values[3][2] = -Vector3::dot(zVec, eye);
 
     result._values[0][3] = 0.0f;
     result._values[1][3] = 0.0f;
@@ -76,6 +97,16 @@ Matrix4 Matrix4::createPerspectiveFieldOfView(float fov, float aspectRatio, floa
     result._values[1][3] = 0;
     result._values[2][3] = d;
     result._values[3][3] = 0;
+
+    return result;
+}
+
+Matrix4 Matrix4::createTranslation(float x, float y, float z) {
+    Matrix4 result = createIdentity();
+
+    result._values[3][0] = x;
+    result._values[3][1] = y;
+    result._values[3][2] = z;
 
     return result;
 }

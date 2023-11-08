@@ -1,31 +1,27 @@
-//
-// Created by Makel on 10/22/2023.
-//
-
 #include "Vector3.h"
 #include <cmath>
 
-inline Vector3::Vector3() {
+Vector3::Vector3() {
     x = 0;
     y = 0;
     z = 0;
 }
 
-inline Vector3::Vector3(const float x, const float y, const float z) {
+Vector3::Vector3(const float x, const float y, const float z) {
     this->x = x;
     this->y = y;
     this->z = z;
 }
 
-inline Vector3 Vector3::operator+(const Vector3 &vec) const { return Vector3(x + vec.x, y + vec.y, z + vec.z); }
+Vector3 Vector3::operator+(const Vector3 &vec) const { return Vector3(x + vec.x, y + vec.y, z + vec.z); }
 
-inline Vector3 Vector3::operator+(const float val) const { return Vector3(x + val, y + val, z + val); }
+Vector3 Vector3::operator+(const float val) const { return Vector3(x + val, y + val, z + val); }
 
-inline Vector3 Vector3::operator-() const {
+Vector3 Vector3::operator-() const {
     return Vector3(-x, -y, -z);
 }
 
-inline Vector3 Vector3::operator-(const Vector3 &vec) const {
+Vector3 Vector3::operator-(const Vector3 &vec) const {
     return Vector3(x - vec.x, y - vec.y, z - vec.z);
 }
 
