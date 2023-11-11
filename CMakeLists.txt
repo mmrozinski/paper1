@@ -15,6 +15,13 @@ add_executable(paper1 main.cpp
         Shader.cpp
         Shader.h
         FileHelper.h
+        ChunkRenderer.cpp
+        ChunkRenderer.h
+        Chunk.cpp
+        Chunk.h
+        Block.h
+        Vector3i.cpp
+        Vector3i.h
 )
 
 find_package(OpenGL REQUIRED)

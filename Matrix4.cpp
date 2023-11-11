@@ -101,12 +101,12 @@ Matrix4 Matrix4::createPerspectiveFieldOfView(float fov, float aspectRatio, floa
     return result;
 }
 
-Matrix4 Matrix4::createTranslation(float x, float y, float z) {
+Matrix4 Matrix4::createTranslation(Vector3 vector) {
     Matrix4 result = createIdentity();
 
-    result._values[3][0] = x;
-    result._values[3][1] = y;
-    result._values[3][2] = z;
+    result._values[3][0] = vector.x;
+    result._values[3][1] = vector.y;
+    result._values[3][2] = vector.z;
 
     return result;
 }

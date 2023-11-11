@@ -19,7 +19,7 @@ public:
     static Matrix4 createIdentity();
     static Matrix4 lookAt(Vector3 eye, Vector3 target, Vector3 up);
     static Matrix4 createPerspectiveFieldOfView(float fov, float aspectRatio, float near, float far);
-    static Matrix4 createTranslation(float x, float y, float z);
+    static Matrix4 createTranslation(Vector3 vector);
 };
 
 

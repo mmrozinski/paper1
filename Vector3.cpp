@@ -7,6 +7,12 @@ Vector3::Vector3() {
     z = 0;
 }
 
+Vector3::Vector3(const Vector3& vector3) {
+    this->x = vector3.x;
+    this->y = vector3.y;
+    this->z = vector3.z;
+}
+
 Vector3::Vector3(const float x, const float y, const float z) {
     this->x = x;
     this->y = y;
@@ -16,6 +22,14 @@ Vector3::Vector3(const float x, const float y, const float z) {
 Vector3 Vector3::operator+(const Vector3 &vec) const { return Vector3(x + vec.x, y + vec.y, z + vec.z); }
 
 Vector3 Vector3::operator+(const float val) const { return Vector3(x + val, y + val, z + val); }
+
+Vector3 Vector3::operator*(const float val) const {
+    return Vector3(x * val, y * val, z * val);
+}
+
+Vector3 Vector3::operator/(const float val) const {
+    return Vector3(x / val, y / val, z / val);
+}
 
 Vector3 Vector3::operator-() const {
     return Vector3(-x, -y, -z);

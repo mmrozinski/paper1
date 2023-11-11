@@ -7,11 +7,17 @@ public:
 
     Vector3();
 
+    Vector3(const Vector3& vector3);
+
     Vector3(float, float, float);
 
     Vector3 operator+(const Vector3 &vec) const;
 
     Vector3 operator+(float val) const;
+
+    Vector3 operator*(float val) const;
+
+    Vector3 operator/(float val) const;
 
     Vector3 operator-() const;
 
