@@ -22,6 +22,8 @@ add_executable(paper1 main.cpp
         Block.h
         Vector3i.cpp
         Vector3i.h
+        ChunkManager.cpp
+        ChunkManager.h
 )
 
 find_package(OpenGL REQUIRED)

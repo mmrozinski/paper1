@@ -29,6 +29,10 @@ Vector3i::operator Vector3() const {
     return Vector3(x, y, z);
 }
 
+bool Vector3i::operator==(const Vector3i& vec) const {
+    return this->x == vec.x && this->y == vec.y && this->z == vec.z;
+}
+
 
 float Vector3i::length() const {
     return sqrtf((x * x) + (y * y) + (z * z));

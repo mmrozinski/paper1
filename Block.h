@@ -5,7 +5,7 @@
 
 class Block {
 public:
-    static const float BLOCK_RENDER_SIZE = 1.0f;
+    static constexpr float BLOCK_RENDER_SIZE = 1.0f;
     bool active = false;
 };
 

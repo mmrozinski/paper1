@@ -3,20 +3,23 @@
 
 #include <vector>
 
-#include "Chunk.h"
+#include "Block.h"
 #include "MeshRenderer.h"
+#include "Vector3i.h"
 
 class ChunkRenderer {
 private:
-    std::vector<MeshRenderer> _meshRenderers = std::vector<MeshRenderer>();
+    static constexpr int CHUNK_SIZE = 8;
+
+    std::vector<MeshRenderer*> _meshRenderers = std::vector<MeshRenderer*>();
     std::vector<int> _meshIds = std::vector<int>();
 
     Matrix4 _view;
     Matrix4 _projection;
 
-    Shader _shader = Shader("shader.vert", "shader.frag");
+    Shader *_shader;
 
-    void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, MeshRenderer renderer);
+    void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, MeshRenderer* renderer);
 
 public:
     ChunkRenderer();
@@ -24,7 +27,7 @@ public:
     void setViewMatrix(Matrix4 matrix);
     void setProjectionMatrix(Matrix4 matrix);
     bool isEmpty(int meshId);
-    int addChunk(Chunk chunk);
+    int addChunk(Vector3i position, Block*[][CHUNK_SIZE][CHUNK_SIZE]);
     void removeChunk(int id);
     void render(int meshId);
 

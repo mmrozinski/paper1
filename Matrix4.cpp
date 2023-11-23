@@ -28,7 +28,7 @@ Matrix4 Matrix4::createIdentity() {
     float v[4][4] = {{1.0f, 0.0f, 0.0f, 0.0f},
                      {0.0f, 1.0f, 0.0f, 0.0f},
                      {0.0f, 0.0f, 1.0f, 0.0f},
-                     {0.0f, 0.0f, 1.0f, 0.0f}};
+                     {0.0f, 0.0f, 0.0f, 1.0f}};
 
     return Matrix4(v);
 }

@@ -14,9 +14,9 @@ private:
     GLuint vertexBufferObject;
     GLuint elementBufferObject;
 
-    Matrix4 model = Matrix4::createTranslation(0.0f, 0.0f, 0.0f);
-    Matrix4 view = Matrix4::createTranslation(0.0f, 0.0f, 0.0f);
-    Matrix4 projection = Matrix4::createPerspectiveFieldOfView(45.0f * (M_PI / 180.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    Matrix4 model = Matrix4::createTranslation(Vector3(0.0f, 0.0f, 0.0f));
+    Matrix4 view = Matrix4::createTranslation(Vector3(0.0f, 0.0f, 0.0f));
+    Matrix4 projection = Matrix4::createPerspectiveFieldOfView(45.0f * M_PI / 180.0f, 800.0f / 600.0f, 0.1f, 100.0f);
 
     Shader *shader;
     bool usesExternalShader;

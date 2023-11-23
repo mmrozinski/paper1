@@ -3,7 +3,7 @@
 MeshRenderer::MeshRenderer() {
     shader = new Shader("shader.vert", "shader.frag");
 
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 
     shader->use();
 
@@ -16,7 +16,7 @@ MeshRenderer::MeshRenderer(Shader *shader) {
     this->shader = shader;
     usesExternalShader = true;
 
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 
     glGenVertexArrays(1, &vertexArrayObject);
     glGenBuffers(1, &vertexBufferObject);
@@ -70,22 +70,24 @@ void MeshRenderer::render() {
 
     glBindVertexArray(vertexArrayObject);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, elementBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // GL_FILL - normal; GL_LINE - wireframe
 
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), vertices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(shader->getAttribLocation("aPosition"));
     glVertexAttribPointer(shader->getAttribLocation("aPosition"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
 
-    glEnableVertexAttribArray(shader->getAttribLocation("aPosition"));
-    glVertexAttribPointer(shader->getAttribLocation("aPosition"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(shader->getAttribLocation("aNormal"));
+    glVertexAttribPointer(shader->getAttribLocation("aNormal"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<GLvoid*>(3 * sizeof(float)));
 
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 }
 
 MeshRenderer::~MeshRenderer() {
-    delete shader;
+    if (!usesExternalShader) {
+        delete shader;
+    }
 }

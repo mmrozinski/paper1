@@ -7,23 +7,22 @@
 #include "Vector3.h"
 #include "Vector3i.h"
 
-
 class Chunk {
 private:
     bool isInitialized = false;
     bool isGenerated = false;
 
-    int* meshId = nullptr;
+    int meshId = -1;
 
     void initialize();
     void generate();
     void updateFullSides();
 
 public:
-    static const int CHUNK_SIZE = 8;
+    static constexpr int CHUNK_SIZE = 8;
 
     enum Sides { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
-    static const Sides allSides[] = { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
+    static constexpr Sides allSides[] = { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
 
     Block* blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 
@@ -43,11 +42,11 @@ public:
     Chunk(Vector3i position);
 
     void load();
-    void unload(ChunkRenderer renderer);
-    void setup(ChunkRenderer renderer);
-    void rebuildMesh(ChunkRenderer renderer);
-    void updateRenderFlags(ChunkRenderer renderer);
-    void render(ChunkRenderer renderer);
+    void unload(ChunkRenderer* renderer);
+    void setup(ChunkRenderer* renderer);
+    void rebuildMesh(ChunkRenderer* renderer);
+    void updateRenderFlags(ChunkRenderer* renderer);
+    void render(ChunkRenderer* renderer);
 
     ~Chunk();
 };

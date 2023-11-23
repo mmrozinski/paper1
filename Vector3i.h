@@ -21,6 +21,8 @@ public:
 
     explicit operator Vector3() const;
 
+    bool operator==(const Vector3i&) const;
+
     float length() const;
 
     static Vector3i unitX();

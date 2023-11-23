@@ -4,6 +4,7 @@
 #include "Vector3.h"
 #include "Matrix4.h"
 #include <cmath>
+#include <bits/stl_algo.h>
 
 class Camera {
 private:
@@ -68,7 +69,9 @@ public:
 
     // Set pitch (deg)
     void setPitch(float pitch) {
-        _pitch = pitch;
+        float angle = std::clamp(pitch, -89.0f, 89.0f);
+        _pitch = angle * M_PI / 180.0f;
+        updateVectors();
     }
 
     // Get yaw (deg)
@@ -78,7 +81,8 @@ public:
 
     // Set yaw (deg)
     void setYaw(float yaw) {
-        _yaw = yaw;
+        _yaw = yaw * M_PI / 180.0f;
+        updateVectors();
     }
 
     // Get fov (deg)
@@ -88,7 +92,8 @@ public:
 
     // Set fov (deg)
     void setFov(float fov) {
-        _fov = fov;
+        float angle = std::clamp(fov, 1.0f, 90.0f);
+        _fov = angle * M_PI / 180.0f;
     }
 };
 

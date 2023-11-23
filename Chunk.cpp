@@ -20,6 +20,8 @@ void Chunk::generate() {
             }
         }
     }
+
+    isGenerated = true;
 }
 
 void Chunk::updateFullSides() {
@@ -85,11 +87,11 @@ void Chunk::load() {
     isLoaded = true;
 }
 
-void Chunk::unload(ChunkRenderer renderer) {
-    if (meshId != nullptr)
+void Chunk::unload(ChunkRenderer* renderer) {
+    if (meshId != -1)
     {
-        renderer.removeChunk(*meshId);
-        meshId = nullptr;
+        renderer->removeChunk(meshId);
+        meshId = -1;
     }
 
     isLoaded = false;
@@ -97,33 +99,36 @@ void Chunk::unload(ChunkRenderer renderer) {
     shouldRender = false;
 }
 
-void Chunk::setup(ChunkRenderer renderer) {
+void Chunk::setup(ChunkRenderer* renderer) {
+    if (!isInitialized) {
+        initialize();
+    }
     if (!isGenerated) {
         generate();
     }
-    meshId = &renderer.addChunk(this); //TODO: this assignement type might be bad, pls verify
+    meshId = renderer->addChunk(position, blocks);
     updateFullSides();
     isSetup = true;
 }
 
-void Chunk::rebuildMesh(ChunkRenderer renderer) {
-    if (meshId != nullptr) {
-        renderer.removeChunk(*meshId);
-        meshId = nullptr;
+void Chunk::rebuildMesh(ChunkRenderer* renderer) {
+    if (meshId != -1) {
+        renderer->removeChunk(meshId);
+        meshId = -1;
     }
-    meshId = &renderer.addChunk(this);
+    meshId = renderer->addChunk(position, blocks);
     updateFullSides();
     needsRebuild = false;
 }
 
-void Chunk::updateRenderFlags(ChunkRenderer renderer) {
-    if (meshId != nullptr) {
-        isEmpty = renderer.isEmpty(*meshId);
+void Chunk::updateRenderFlags(ChunkRenderer* renderer) {
+    if (meshId != -1) {
+        isEmpty = renderer->isEmpty(meshId);
     } else {
         isEmpty = true;
     }
 
-    if (isEmpty || !isLoaded || isSetup) {
+    if (isEmpty || !isLoaded || !isSetup) {
         shouldRender = false;
     } else {
         if (isLoaded && isSetup) {
@@ -132,9 +137,9 @@ void Chunk::updateRenderFlags(ChunkRenderer renderer) {
     }
 }
 
-void Chunk::render(ChunkRenderer renderer) {
-    if (meshId != nullptr) {
-        renderer.render(*meshId);
+void Chunk::render(ChunkRenderer* renderer) {
+    if (meshId != -1) {
+        renderer->render(meshId);
     }
 }
 
