@@ -6,7 +6,11 @@
 
 // pls make this a class
 
+int win_height = 720;
+int win_width = 1280;
+
 int frame = 0, deltaTime, timebase = 0;
+int keyboardTime, keyboardTimebase = 0;
 double fps;
 ChunkManager* chunkManager;
 Camera camera = Camera(Vector3(0.0f, 0.0f, 3.0f), 1.0f);
@@ -14,6 +18,11 @@ bool firstMove = true;
 int lastPosX = 0;
 int lastPosY = 0;
 float sensitivity = 1.0f;
+float speed = 10.0f;
+
+bool doListUpdates = true;
+
+float fps_cap = 144.0f;
 
 void countFPS() {
     if (deltaTime - timebase > 1000) {
@@ -27,7 +36,7 @@ void countFPS() {
 }
 
 void handleDisplay() {
-    chunkManager->update(camera);
+    chunkManager->update(camera, doListUpdates);
 
     frame++;
     deltaTime = glutGet(GLUT_ELAPSED_TIME);
@@ -41,12 +50,26 @@ void handleResize(int sizeX, int sizeY) {
     glViewport(0, 0, sizeX, sizeY);
 
     camera.setAspectRatio(static_cast<float>(sizeX) / static_cast<float>(sizeY));
+
+    win_width = sizeX;
+    win_height = sizeY;
 }
 
 void handleKeyboardInput(unsigned char key, int x, int y) {
+    keyboardTime = glutGet(GLUT_ELAPSED_TIME);
     if (key == 27) {
         glutLeaveMainLoop();
     }
+
+    if (key == 'w') {
+        camera.setPosition(camera.getPosition() + camera.getFront() * speed * ((keyboardTime - keyboardTimebase) * 0.001));
+    }
+
+    if (key == 'p') {
+        doListUpdates = !doListUpdates;
+    }
+
+    keyboardTimebase = keyboardTime;
 }
 
 void handleMouseMove(int x, int y) {
@@ -67,19 +90,21 @@ void handleMouseMove(int x, int y) {
         camera.setPitch(camera.getPitch() - deltaY * sensitivity);
     }
 
-    glutWarpPointer(800/2, 600/2);
+    glutWarpPointer(win_width/2, win_height/2);
+    lastPosX = win_width/2;
+    lastPosY = win_height/2;
 }
 
 void timer(int) {
     glutPostRedisplay();
-    glutTimerFunc(1000 / 60, timer, 0);
+    glutTimerFunc(1000 / fps_cap, timer, 0);
 }
 
 void initGLUT(int *argc, char **argv) {
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
-    glutInitWindowSize(800, 600);
+    glutInitWindowSize(win_width, win_height);
     glutCreateWindow("nice squares");
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -88,7 +113,7 @@ void initGLUT(int *argc, char **argv) {
     glutReshapeFunc(handleResize);
     glutKeyboardFunc(handleKeyboardInput);
     glutPassiveMotionFunc(handleMouseMove);
-    glutTimerFunc(1000 / 60, timer, 0);
+    glutTimerFunc(1000 / fps_cap, timer, 0);
 }
 
 int main(int argc, char **argv) {

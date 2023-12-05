@@ -24,6 +24,10 @@ add_executable(paper1 main.cpp
         Vector3i.h
         ChunkManager.cpp
         ChunkManager.h
+        Plane.h
+        Frustum.cpp
+        Frustum.h
+        FastNoiseLite.h
 )
 
 find_package(OpenGL REQUIRED)

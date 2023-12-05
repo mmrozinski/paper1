@@ -13,6 +13,9 @@ Chunk* ChunkManager::getChunk(Vector3i position) {
 ChunkManager::ChunkManager() {
     _renderer = new ChunkRenderer();
     _meshRenderer = new MeshRenderer();
+
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    noise.SetSeed(static_cast<int>(time(nullptr)));
 }
 
 void ChunkManager::updateLoadList() {
@@ -33,7 +36,7 @@ void ChunkManager::updateLoadList() {
 void ChunkManager::updateSetupList() {
     for (auto chunk: setupList) {
         if (chunk->isLoaded && !chunk->isSetup) {
-            chunk->setup(_renderer);
+            chunk->setup(_renderer, noise);
         }
     }
     setupList.clear();
@@ -171,6 +174,17 @@ void ChunkManager::updateUnloadList() {
         if (chunk->isLoaded) {
             chunk->unload(_renderer);
         }
+
+        masterList.erase(std::remove(masterList.begin(), masterList.end(), chunk), masterList.end());
+        // loadList.erase(std::remove(loadList.begin(), loadList.end(), chunk), loadList.end());
+        // setupList.erase(std::remove(setupList.begin(), setupList.end(), chunk), setupList.end());
+        // rebuildList.erase(std::remove(rebuildList.begin(), rebuildList.end(), chunk), rebuildList.end());
+        // flagsUpdateList.erase(std::remove(flagsUpdateList.begin(), flagsUpdateList.end(), chunk), flagsUpdateList.end());
+        // unloadList.erase(std::remove(unloadList.begin(), unloadList.end(), chunk), unloadList.end());
+        // visibleList.erase(std::remove(visibleList.begin(), visibleList.end(), chunk), visibleList.end());
+        // renderList.erase(std::remove(renderList.begin(), renderList.end(), chunk), renderList.end());
+        //
+        // delete chunk;
     }
     unloadList.clear();
 }
@@ -185,11 +199,13 @@ void ChunkManager::updateVisible(Vector3 position) {
                 Chunk* chunk = getChunk(chunkPosition);
 
                 if (chunk == nullptr) {
-                    if (chunkPosition.x >= 0 && chunkPosition.y >= 0 && chunkPosition.z >= 0 && chunkPosition.x <
-                        WORLD_SIZE && chunkPosition.y < WORLD_SIZE && chunkPosition.z < WORLD_SIZE) {
-                        chunk = new Chunk(chunkPosition);
-                        masterList.push_back(chunk);
-                    }
+                    // if (chunkPosition.x >= 0 && chunkPosition.y >= 0 && chunkPosition.z >= 0 && chunkPosition.x <
+                    //     WORLD_SIZE && chunkPosition.y < WORLD_SIZE && chunkPosition.z < WORLD_SIZE) {
+                    //     chunk = new Chunk(chunkPosition);
+                    //     masterList.push_back(chunk);
+                    // }
+                    chunk = new Chunk(chunkPosition);
+                    masterList.push_back(chunk);
                 }
             }
         }
@@ -232,6 +248,7 @@ void ChunkManager::updateVisible(Vector3 position) {
 void ChunkManager::updateRenderList(Camera camera) {
     Matrix4 projection = camera.getProjectionMatrix();
     Matrix4 view = camera.getViewMatrix();
+    frustum = Frustum(view * projection);
 
     renderList.clear();
 
@@ -241,8 +258,9 @@ void ChunkManager::updateRenderList(Camera camera) {
                 float offset = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
                 Vector3 chunkCenter = Chunk::chunkToVoxelPosiotion(chunk->position) + Vector3(offset, offset, offset);
                 float size = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
-                // add frustum checks here
-                renderList.push_back(chunk);
+                if (frustum.cubeInFrustum(chunkCenter, size, size, size) != Frustum::FRUSTUM_OUTSIDE) {
+                    renderList.push_back(chunk);
+                }
             }
         }
     }
@@ -272,6 +290,8 @@ void ChunkManager::update(Camera camera, bool doListUpdates) {
         updateVisible(camera.getPosition());
 
         updateRenderList(camera);
+
+        frustum.preRender(_meshRenderer);
     }
 
     _renderer->setViewMatrix(camera.getViewMatrix());
@@ -287,7 +307,7 @@ void ChunkManager::render() {
     for (auto chunk: renderList) {
         chunk->render(_renderer);
     }
-    glFlush();
+    //_meshRenderer->render();
     glutSwapBuffers();
 }
 

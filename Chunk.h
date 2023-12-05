@@ -4,6 +4,7 @@
 
 #include "Block.h"
 #include "ChunkRenderer.h"
+#include "FastNoiseLite.h"
 #include "Vector3.h"
 #include "Vector3i.h"
 
@@ -15,7 +16,7 @@ private:
     int meshId = -1;
 
     void initialize();
-    void generate();
+    void generate(FastNoiseLite noise);
     void updateFullSides();
 
 public:
@@ -28,10 +29,10 @@ public:
 
     Vector3i position;
 
-    bool isLoaded;
-    bool isSetup;
-    bool shouldRender;
-    bool isEmpty;
+    bool isLoaded = false;
+    bool isSetup = false;
+    bool shouldRender = false;
+    bool isEmpty = false;
     bool needsRebuild = true;
 
     std::set<Sides> fullSides = std::set<Sides>();
@@ -43,7 +44,7 @@ public:
 
     void load();
     void unload(ChunkRenderer* renderer);
-    void setup(ChunkRenderer* renderer);
+    void setup(ChunkRenderer* renderer, FastNoiseLite noise);
     void rebuildMesh(ChunkRenderer* renderer);
     void updateRenderFlags(ChunkRenderer* renderer);
     void render(ChunkRenderer* renderer);

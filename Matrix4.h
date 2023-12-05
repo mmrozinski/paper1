@@ -15,6 +15,7 @@ public:
 
     float* operator[](std::size_t idx) { return _values[idx]; };
     const float* operator[](std::size_t idx) const { return _values[idx]; };
+    Matrix4 operator*(Matrix4 matrix);
 
     static Matrix4 createIdentity();
     static Matrix4 lookAt(Vector3 eye, Vector3 target, Vector3 up);

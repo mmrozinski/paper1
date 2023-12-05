@@ -12,11 +12,18 @@ void Chunk::initialize() {
     isInitialized = true;
 }
 
-void Chunk::generate() {
-    for (auto&block: blocks) {
-        for (auto&y: block) {
-            for (auto&z: y) {
-                z->active = true;
+void Chunk::generate(FastNoiseLite noise) {
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+        for (int z = 0; z < CHUNK_SIZE; z++) {
+            Vector3 globalPosition = chunkToVoxelPosiotion(position);
+
+            float height = noise.GetNoise(globalPosition.x + x, globalPosition.z + z) * CHUNK_SIZE * 8;
+
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                if (globalPosition.y + y > height) {
+                    break;
+                }
+                blocks[x][y][z]->active = true;
             }
         }
     }
@@ -99,12 +106,12 @@ void Chunk::unload(ChunkRenderer* renderer) {
     shouldRender = false;
 }
 
-void Chunk::setup(ChunkRenderer* renderer) {
+void Chunk::setup(ChunkRenderer* renderer, FastNoiseLite noise) {
     if (!isInitialized) {
         initialize();
     }
     if (!isGenerated) {
-        generate();
+        generate(noise);
     }
     meshId = renderer->addChunk(position, blocks);
     updateFullSides();
@@ -116,6 +123,7 @@ void Chunk::rebuildMesh(ChunkRenderer* renderer) {
         renderer->removeChunk(meshId);
         meshId = -1;
     }
+
     meshId = renderer->addChunk(position, blocks);
     updateFullSides();
     needsRebuild = false;

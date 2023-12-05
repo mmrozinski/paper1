@@ -23,6 +23,8 @@ public:
 
     Vector3 operator-(const Vector3 &vec) const;
 
+    friend Vector3 operator*(float lval, Vector3 rval);
+
     float length() const;
 
     static Vector3 unitX();

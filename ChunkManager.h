@@ -1,17 +1,22 @@
 #ifndef CHUNKMANAGER_H
 #define CHUNKMANAGER_H
 #include <vector>
+#include <algorithm>
+#include <GL/glew.h>
+#include <GL/freeglut_std.h>
 
 #include "Camera.h"
 #include "Chunk.h"
-#include <GL/freeglut_std.h>
+#include "Frustum.h"
+#include "FastNoiseLite.h"
+
 
 class ChunkManager {
 private:
-    const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 8;
-    const int CHUNK_VISIBILITY_DISTANCE = 4;
+    const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 16;
+    const int CHUNK_VISIBILITY_DISTANCE = 8;
 
-    const int WORLD_SIZE = 8;
+    const int WORLD_SIZE = 16;
     std::vector<Chunk*> masterList = std::vector<Chunk*>();
 
     std::vector<Chunk*> loadList = std::vector<Chunk*>();
@@ -24,6 +29,9 @@ private:
 
     ChunkRenderer* _renderer;
     MeshRenderer* _meshRenderer;
+
+    Frustum frustum;
+    FastNoiseLite noise;
 
     Chunk* getChunk(Vector3i position);
 public:

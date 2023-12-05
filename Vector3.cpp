@@ -71,3 +71,6 @@ float Vector3::dot(const Vector3 &left, const Vector3 &right) {
     return (left.x * right.x) + (left.y * right.y) + (left.z * right.z);
 }
 
+Vector3 operator*(float lval, Vector3 rval) {
+    return rval * lval;
+}
