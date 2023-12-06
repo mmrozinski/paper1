@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 
-Camera::Camera(Vector3 position, float aspectRatio) {
+Camera::Camera(const Vector3& position, float aspectRatio) {
     _position = position;
     _aspectRatio = aspectRatio;
 }

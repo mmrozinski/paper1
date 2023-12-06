@@ -72,7 +72,7 @@ void Shader::setMatrix4(const std::string& name, Matrix4 &projection) {
     glUniformMatrix4fv(matrixLocation, 1, GL_TRUE, projection[0]);
 }
 
-int Shader::getAttribLocation(const std::string& name) {
+int Shader::getAttribLocation(const std::string& name) const {
     return glGetAttribLocation(_handle, name.c_str());
 }
 

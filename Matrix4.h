@@ -10,7 +10,7 @@ private:
 
 public:
     Matrix4();
-    Matrix4(float values[4][4]);
+    explicit Matrix4(float values[4][4]);
     Matrix4(const Matrix4 &matrix);
 
     float* operator[](std::size_t idx) { return _values[idx]; };
@@ -18,9 +18,9 @@ public:
     Matrix4 operator*(Matrix4 matrix);
 
     static Matrix4 createIdentity();
-    static Matrix4 lookAt(Vector3 eye, Vector3 target, Vector3 up);
+    static Matrix4 lookAt(const Vector3& eye, const Vector3& target, const Vector3& up);
     static Matrix4 createPerspectiveFieldOfView(float fov, float aspectRatio, float near, float far);
-    static Matrix4 createTranslation(Vector3 vector);
+    static Matrix4 createTranslation(const Vector3& vector);
 };
 
 

@@ -189,7 +189,7 @@ void ChunkManager::updateUnloadList() {
     unloadList.clear();
 }
 
-void ChunkManager::updateVisible(Vector3 position) {
+void ChunkManager::updateVisible(const Vector3& position) {
     visibleList.clear();
 
     for (int x = -CHUNK_VISIBILITY_DISTANCE; x < CHUNK_VISIBILITY_DISTANCE; x++) {
@@ -245,7 +245,7 @@ void ChunkManager::updateVisible(Vector3 position) {
     }
 }
 
-void ChunkManager::updateRenderList(Camera camera) {
+void ChunkManager::updateRenderList(const Camera& camera) {
     Matrix4 projection = camera.getProjectionMatrix();
     Matrix4 view = camera.getViewMatrix();
     frustum = Frustum(view * projection);

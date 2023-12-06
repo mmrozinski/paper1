@@ -25,11 +25,11 @@ public:
         this->d = d;
     }
 
-    Vector3 getNormal() {
-        return Vector3(a, b, c);
+    Vector3 getNormal() const {
+        return {a, b, c};
     }
 
-    float getPointDistance(Vector3 point) {
+    float getPointDistance(const Vector3& point) const {
         return (a * point.x + b * point.y + c * point.z + d) / sqrtf(a * a + b * b + c * c);
     }
 };

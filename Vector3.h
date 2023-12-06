@@ -23,7 +23,7 @@ public:
 
     Vector3 operator-(const Vector3 &vec) const;
 
-    friend Vector3 operator*(float lval, Vector3 rval);
+    friend Vector3 operator*(float lval, const Vector3& rval);
 
     float length() const;
 

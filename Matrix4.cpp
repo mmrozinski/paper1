@@ -1,9 +1,9 @@
 #include "Matrix4.h"
 
 Matrix4::Matrix4() {
-    for (int i = 0; i < 4; i++) {
+    for (auto & _value : _values) {
         for (int j = 0; j < 4; j++) {
-            _values[i][j] = 0;
+            _value[j] = 0;
         }
     }
 }
@@ -89,7 +89,7 @@ Matrix4 Matrix4::createIdentity() {
     return Matrix4(v);
 }
 
-Matrix4 Matrix4::lookAt(Vector3 eye, Vector3 target, Vector3 up) {
+Matrix4 Matrix4::lookAt(const Vector3& eye, const Vector3& target, const Vector3& up) {
     Vector3 zVec = Vector3::normalize(eye - target);
     Vector3 xVec = Vector3::normalize(Vector3::cross(up, zVec));
     Vector3 yVec = Vector3::normalize(Vector3::cross(zVec, xVec));
@@ -157,7 +157,7 @@ Matrix4 Matrix4::createPerspectiveFieldOfView(float fov, float aspectRatio, floa
     return result;
 }
 
-Matrix4 Matrix4::createTranslation(Vector3 vector) {
+Matrix4 Matrix4::createTranslation(const Vector3& vector) {
     Matrix4 result = createIdentity();
 
     result._values[3][0] = vector.x;

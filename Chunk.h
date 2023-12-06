@@ -25,7 +25,7 @@ public:
     enum Sides { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
     static constexpr Sides allSides[] = { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
 
-    Block* blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+    Block* blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
 
     Vector3i position;
 
@@ -37,17 +37,17 @@ public:
 
     std::set<Sides> fullSides = std::set<Sides>();
 
-    static Vector3i voxelToChunkPosition(Vector3 position);
+    static Vector3i voxelToChunkPosition(const Vector3& position);
     static Vector3 chunkToVoxelPosition(Vector3i position);
 
-    Chunk(Vector3i position);
+    explicit Chunk(Vector3i position);
 
     void load();
     void unload(ChunkRenderer* renderer);
     void setup(ChunkRenderer* renderer, FastNoiseLite noise);
     void rebuildMesh(ChunkRenderer* renderer);
     void updateRenderFlags(ChunkRenderer* renderer);
-    void render(ChunkRenderer* renderer);
+    void render(ChunkRenderer* renderer) const;
 
     ~Chunk();
 };

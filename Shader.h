@@ -14,7 +14,7 @@ private:
 public:
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
     void setMatrix4(const std::string& name, Matrix4 &projection);
-    int getAttribLocation(const std::string& name);
+    int getAttribLocation(const std::string& name) const;
     void use();
     ~Shader();
 };

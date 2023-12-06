@@ -42,7 +42,7 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)) {
         keyboardTime = glutGet(GLUT_ELAPSED_TIME);
 
-        KBDLLHOOKSTRUCT* pKeyStruct = (KBDLLHOOKSTRUCT*)lParam;
+        auto* pKeyStruct = (KBDLLHOOKSTRUCT*)lParam;
         if (pKeyStruct->vkCode == VK_ESCAPE) {
             glutLeaveMainLoop();
         }
@@ -142,7 +142,7 @@ void initGLUT(int *argc, char **argv) {
     glutTimerFunc(1000 / fps_cap, timer, 0);
     glutTimerFunc(10, handleUpdate, 0);
 
-    keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, NULL, 0);
+    keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, nullptr, 0);
 
     while(ShowCursor(false) >= 0);
 }

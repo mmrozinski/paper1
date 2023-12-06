@@ -23,14 +23,14 @@ private:
 
 public:
     MeshRenderer();
-    MeshRenderer(Shader *shader);
+    explicit MeshRenderer(Shader *shader);
 
-    int addVertexToMesh(Vector3 position, Vector3 normal);
+    int addVertexToMesh(const Vector3& position, const Vector3& normal);
     void addTriangleToMesh(unsigned int v1, unsigned int v2, unsigned int v3);
 
-    void setProjectionMatrix(Matrix4 matrix);
-    void setViewMatrix(Matrix4 matrix);
-    void setModelMatrix(Matrix4 matrix);
+    void setProjectionMatrix(const Matrix4& matrix);
+    void setViewMatrix(const Matrix4& matrix);
+    void setModelMatrix(const Matrix4& matrix);
 
     bool isEmpty();
 

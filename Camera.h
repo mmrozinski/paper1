@@ -15,7 +15,7 @@ private:
     Vector3 _right = Vector3::unitX();
 
     // Rotation around x (rad)
-    float _pitch;
+    float _pitch = 0.0f;
 
     // Rotation around y (rad)
     float _yaw = -M_PI / 2.0f;
@@ -24,11 +24,11 @@ private:
     float _aspectRatio;
 
 public:
-    Camera(Vector3 position, float aspectRatio);
+    Camera(const Vector3& position, float aspectRatio);
 
     Vector3 getPosition() { return _position; }
 
-    void setPosition(Vector3 position) { _position = position; }
+    void setPosition(const Vector3& position) { _position = position; }
 
     void setAspectRatio(float aspectRatio) { _aspectRatio = aspectRatio; }
 

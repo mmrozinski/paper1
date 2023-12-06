@@ -19,13 +19,13 @@ private:
 
     Shader *_shader;
 
-    void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, MeshRenderer* renderer);
+    static void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, MeshRenderer* renderer);
 
 public:
     ChunkRenderer();
 
-    void setViewMatrix(Matrix4 matrix);
-    void setProjectionMatrix(Matrix4 matrix);
+    void setViewMatrix(const Matrix4& matrix);
+    void setProjectionMatrix(const Matrix4& matrix);
     bool isEmpty(int meshId);
     int addChunk(Vector3i position, Block*[][CHUNK_SIZE][CHUNK_SIZE]);
     void removeChunk(int id);
