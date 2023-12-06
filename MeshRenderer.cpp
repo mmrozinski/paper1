@@ -23,7 +23,7 @@ MeshRenderer::MeshRenderer(Shader *shader) {
     glGenBuffers(1, &elementBufferObject);
 }
 
-int MeshRenderer::addVertexToMesh(Vector3 position, Vector3 normal) {
+int MeshRenderer::addVertexToMesh(const Vector3& position, const Vector3& normal) {
     vertices.push_back(position.x);
     vertices.push_back(position.y);
     vertices.push_back(position.z);
@@ -41,16 +41,16 @@ void MeshRenderer::addTriangleToMesh(unsigned int v1, unsigned int v2, unsigned 
     indices.push_back(v3);
 }
 
-void MeshRenderer::setProjectionMatrix(Matrix4 matrix) {
+void MeshRenderer::setProjectionMatrix(const Matrix4& matrix) {
     projection = matrix;
 }
 
 
-void MeshRenderer::setViewMatrix(Matrix4 matrix) {
+void MeshRenderer::setViewMatrix(const Matrix4& matrix) {
     view = matrix;
 }
 
-void MeshRenderer::setModelMatrix(Matrix4 matrix) {
+void MeshRenderer::setModelMatrix(const Matrix4& matrix) {
     model = matrix;
 }
 

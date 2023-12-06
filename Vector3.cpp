@@ -19,24 +19,24 @@ Vector3::Vector3(const float x, const float y, const float z) {
     this->z = z;
 }
 
-Vector3 Vector3::operator+(const Vector3 &vec) const { return Vector3(x + vec.x, y + vec.y, z + vec.z); }
+Vector3 Vector3::operator+(const Vector3 &vec) const { return {x + vec.x, y + vec.y, z + vec.z}; }
 
-Vector3 Vector3::operator+(const float val) const { return Vector3(x + val, y + val, z + val); }
+Vector3 Vector3::operator+(const float val) const { return {x + val, y + val, z + val}; }
 
 Vector3 Vector3::operator*(const float val) const {
-    return Vector3(x * val, y * val, z * val);
+    return {x * val, y * val, z * val};
 }
 
 Vector3 Vector3::operator/(const float val) const {
-    return Vector3(x / val, y / val, z / val);
+    return {x / val, y / val, z / val};
 }
 
 Vector3 Vector3::operator-() const {
-    return Vector3(-x, -y, -z);
+    return {-x, -y, -z};
 }
 
 Vector3 Vector3::operator-(const Vector3 &vec) const {
-    return Vector3(x - vec.x, y - vec.y, z - vec.z);
+    return {x - vec.x, y - vec.y, z - vec.z};
 }
 
 
@@ -44,11 +44,11 @@ float Vector3::length() const {
     return sqrtf((x * x) + (y * y) + (z * z));
 }
 
-Vector3 Vector3::unitX() { return Vector3(1, 0, 0); }
+Vector3 Vector3::unitX() { return {1, 0, 0}; }
 
-Vector3 Vector3::unitY() { return Vector3(0, 1, 0); }
+Vector3 Vector3::unitY() { return {0, 1, 0}; }
 
-Vector3 Vector3::unitZ() { return Vector3(0, 0, 1); }
+Vector3 Vector3::unitZ() { return {0, 0, 1}; }
 
 Vector3 Vector3::normalize(Vector3 vector) {
     float scale = 1.0f / vector.length();
@@ -61,16 +61,15 @@ Vector3 Vector3::normalize(Vector3 vector) {
 }
 
 Vector3 Vector3::cross(const Vector3 &left, const Vector3 &right) {
-    return Vector3(
-            (left.y * right.z) - (left.z * right.y),
+    return {(left.y * right.z) - (left.z * right.y),
             (left.z * right.x) - (left.x * right.z),
-            (left.x * right.y) - (left.y * right.x));
+            (left.x * right.y) - (left.y * right.x)};
 }
 
 float Vector3::dot(const Vector3 &left, const Vector3 &right) {
     return (left.x * right.x) + (left.y * right.y) + (left.z * right.z);
 }
 
-Vector3 operator*(float lval, Vector3 rval) {
+Vector3 operator*(float lval, const Vector3& rval) {
     return rval * lval;
 }

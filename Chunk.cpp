@@ -70,13 +70,13 @@ void Chunk::updateFullSides() {
     }
 }
 
-Vector3i Chunk::voxelToChunkPosition(Vector3 position) {
+Vector3i Chunk::voxelToChunkPosition(const Vector3& position) {
     Vector3 vec = ((position) / CHUNK_SIZE / Block::BLOCK_RENDER_SIZE);
     const int x = static_cast<int>(vec.x);
     const int y = static_cast<int>(vec.y);
     const int z = static_cast<int>(vec.z);
 
-    return Vector3i(x, y, z);
+    return {x, y, z};
 }
 
 Vector3 Chunk::chunkToVoxelPosition(Vector3i position) {
@@ -121,7 +121,6 @@ void Chunk::setup(ChunkRenderer* renderer, FastNoiseLite noise) {
 void Chunk::rebuildMesh(ChunkRenderer* renderer) {
     if (meshId != -1) {
         renderer->removeChunk(meshId);
-        meshId = -1;
     }
 
     meshId = renderer->addChunk(position, blocks);
@@ -145,7 +144,7 @@ void Chunk::updateRenderFlags(ChunkRenderer* renderer) {
     }
 }
 
-void Chunk::render(ChunkRenderer* renderer) {
+void Chunk::render(ChunkRenderer* renderer) const {
     if (meshId != -1) {
         renderer->render(meshId);
     }

@@ -25,7 +25,7 @@ Frustum::Frustum(Matrix4 matrix) {
     planes[5] = Plane(matrix[0][3] - matrix[0][2], matrix[1][3] - matrix[1][2], matrix[2][3] - matrix[2][2], matrix[3][3] - matrix[3][2]);
 }
 
-Frustum::Intersections Frustum::pointInFrustum(Vector3 point) {
+Frustum::Intersections Frustum::pointInFrustum(const Vector3& point) {
     for (int i = 0; i < 6; i++) {
         if (planes[i].getPointDistance(point) < 0) {
             return FRUSTUM_OUTSIDE;
@@ -34,7 +34,7 @@ Frustum::Intersections Frustum::pointInFrustum(Vector3 point) {
     return FRUSTUM_INSIDE;
 }
 
-Frustum::Intersections Frustum::sphereInFrustum(Vector3 point, float radius) {
+Frustum::Intersections Frustum::sphereInFrustum(const Vector3& point, float radius) {
     Intersections result = FRUSTUM_INSIDE;
     for (int i = 0; i < 6; i++) {
         float distance = planes[i].getPointDistance(point);
@@ -47,7 +47,7 @@ Frustum::Intersections Frustum::sphereInFrustum(Vector3 point, float radius) {
     return result;
 }
 
-Frustum::Intersections Frustum::cubeInFrustum(Vector3 center, float x, float y, float z) {
+Frustum::Intersections Frustum::cubeInFrustum(const Vector3& center, float x, float y, float z) {
     Intersections result = FRUSTUM_INSIDE;
     for (int i = 0; i < 6; i++) {
         int outside = 0;

@@ -97,14 +97,14 @@ ChunkRenderer::ChunkRenderer() {
     _shader->use();
 }
 
-void ChunkRenderer::setViewMatrix(Matrix4 matrix) {
+void ChunkRenderer::setViewMatrix(const Matrix4& matrix) {
     _view = matrix;
     for (auto renderer: _meshRenderers) {
         renderer->setViewMatrix(_view);
     }
 }
 
-void ChunkRenderer::setProjectionMatrix(Matrix4 matrix) {
+void ChunkRenderer::setProjectionMatrix(const Matrix4& matrix) {
     _projection = matrix;
     for (auto renderer: _meshRenderers) {
         renderer->setProjectionMatrix(_projection);
@@ -121,7 +121,7 @@ bool ChunkRenderer::isEmpty(int meshId) {
 }
 
 int ChunkRenderer::addChunk(Vector3i position, Block* blocks[][CHUNK_SIZE][CHUNK_SIZE]) {
-    MeshRenderer* renderer = new MeshRenderer(_shader);
+    auto* renderer = new MeshRenderer(_shader);
     renderer->setViewMatrix(_view);
     renderer->setProjectionMatrix(_projection);
     renderer->setModelMatrix(

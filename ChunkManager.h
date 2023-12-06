@@ -42,8 +42,8 @@ public:
     void updateRebuildList();
     void updateFlagsList();
     void updateUnloadList();
-    void updateVisible(Vector3 position);
-    void updateRenderList(Camera camera);
+    void updateVisible(const Vector3& position);
+    void updateRenderList(const Camera& camera);
     void update(Camera camera);
     void update(Camera camera, bool doListUpdates);
     void render();
