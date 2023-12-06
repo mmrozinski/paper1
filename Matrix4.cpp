@@ -86,7 +86,7 @@ Matrix4 Matrix4::createIdentity() {
                      {0.0f, 0.0f, 1.0f, 0.0f},
                      {0.0f, 0.0f, 0.0f, 1.0f}};
 
-    return {v};
+    return Matrix4(v);
 }
 
 Matrix4 Matrix4::lookAt(const Vector3& eye, const Vector3& target, const Vector3& up) {
