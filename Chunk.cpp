@@ -15,7 +15,7 @@ void Chunk::initialize() {
 void Chunk::generate(FastNoiseLite noise) {
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
-            Vector3 globalPosition = chunkToVoxelPosiotion(position);
+            Vector3 globalPosition = chunkToVoxelPosition(position);
 
             float height = noise.GetNoise(globalPosition.x + x, globalPosition.z + z) * CHUNK_SIZE * 8;
 
@@ -79,7 +79,7 @@ Vector3i Chunk::voxelToChunkPosition(Vector3 position) {
     return Vector3i(x, y, z);
 }
 
-Vector3 Chunk::chunkToVoxelPosiotion(Vector3i position) {
+Vector3 Chunk::chunkToVoxelPosition(Vector3i position) {
     return Vector3(static_cast<Vector3>(position) * CHUNK_SIZE * Block::BLOCK_RENDER_SIZE);
 }
 

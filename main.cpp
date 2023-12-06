@@ -1,3 +1,4 @@
+#include <Windows.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <iostream>
@@ -6,8 +7,8 @@
 
 // pls make this a class
 
-int win_height = 720;
-int win_width = 1280;
+int win_height = 600;
+int win_width = 800;
 
 int frame = 0, deltaTime, timebase = 0;
 int keyboardTime, keyboardTimebase = 0;
@@ -35,9 +36,46 @@ void countFPS() {
     }
 }
 
-void handleDisplay() {
-    chunkManager->update(camera, doListUpdates);
+HHOOK keyboardHook;
 
+LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)) {
+        keyboardTime = glutGet(GLUT_ELAPSED_TIME);
+
+        KBDLLHOOKSTRUCT* pKeyStruct = (KBDLLHOOKSTRUCT*)lParam;
+        if (pKeyStruct->vkCode == VK_ESCAPE) {
+            glutLeaveMainLoop();
+        }
+
+        if (pKeyStruct->vkCode == 'W') {
+            camera.setPosition(camera.getPosition() + camera.getFront() * speed * ((keyboardTime - keyboardTimebase)));
+        }
+        if (pKeyStruct->vkCode == 'S') {
+            camera.setPosition(camera.getPosition() - camera.getFront() * speed * ((keyboardTime - keyboardTimebase)));
+        }
+        if (pKeyStruct->vkCode == 'A') {
+            camera.setPosition(camera.getPosition() - camera.getRight() * speed * ((keyboardTime - keyboardTimebase)));
+        }
+        if (pKeyStruct->vkCode == 'D') {
+            camera.setPosition(camera.getPosition() + camera.getRight() * speed * ((keyboardTime - keyboardTimebase)));
+        }
+        if (pKeyStruct->vkCode == VK_SPACE) {
+            camera.setPosition(camera.getPosition() + camera.getUp() * speed * ((keyboardTime - keyboardTimebase)));
+        }
+        if (pKeyStruct->vkCode == VK_LSHIFT) {
+            camera.setPosition(camera.getPosition() - camera.getUp() * speed * ((keyboardTime - keyboardTimebase)));
+        }
+
+        if (pKeyStruct->vkCode == 'P') {
+            doListUpdates = !doListUpdates;
+        }
+    }
+    keyboardTimebase = keyboardTime;
+    return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
+}
+
+
+void handleDisplay() {
     frame++;
     deltaTime = glutGet(GLUT_ELAPSED_TIME);
 
@@ -55,21 +93,10 @@ void handleResize(int sizeX, int sizeY) {
     win_height = sizeY;
 }
 
-void handleKeyboardInput(unsigned char key, int x, int y) {
-    keyboardTime = glutGet(GLUT_ELAPSED_TIME);
-    if (key == 27) {
-        glutLeaveMainLoop();
-    }
+void handleUpdate(int) {
+    chunkManager->update(camera, doListUpdates);
 
-    if (key == 'w') {
-        camera.setPosition(camera.getPosition() + camera.getFront() * speed * ((keyboardTime - keyboardTimebase) * 0.001));
-    }
-
-    if (key == 'p') {
-        doListUpdates = !doListUpdates;
-    }
-
-    keyboardTimebase = keyboardTime;
+    glutTimerFunc(10, handleUpdate, 0);
 }
 
 void handleMouseMove(int x, int y) {
@@ -111,9 +138,13 @@ void initGLUT(int *argc, char **argv) {
 
     glutDisplayFunc(handleDisplay);
     glutReshapeFunc(handleResize);
-    glutKeyboardFunc(handleKeyboardInput);
     glutPassiveMotionFunc(handleMouseMove);
     glutTimerFunc(1000 / fps_cap, timer, 0);
+    glutTimerFunc(10, handleUpdate, 0);
+
+    keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, NULL, 0);
+
+    while(ShowCursor(false) >= 0);
 }
 
 int main(int argc, char **argv) {
@@ -130,6 +161,8 @@ int main(int argc, char **argv) {
     glutMainLoop();
 
     delete chunkManager;
+
+    UnhookWindowsHookEx(keyboardHook);
 
     return 0;
 }

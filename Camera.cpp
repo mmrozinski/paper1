@@ -11,6 +11,8 @@ void Camera::updateVectors() {
     _front.y = sinf(_pitch);
     _front.z = cosf(_pitch) * sinf(_yaw);
 
+    _right = Vector3::cross(_front, _up);
+
     _front = Vector3::normalize(_front);
     _right = Vector3::normalize(_right);
     _up = Vector3::normalize(_up);

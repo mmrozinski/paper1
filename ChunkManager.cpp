@@ -256,7 +256,7 @@ void ChunkManager::updateRenderList(Camera camera) {
         if (chunk->isLoaded && chunk->isSetup) {
             if (chunk->shouldRender) {
                 float offset = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
-                Vector3 chunkCenter = Chunk::chunkToVoxelPosiotion(chunk->position) + Vector3(offset, offset, offset);
+                Vector3 chunkCenter = Chunk::chunkToVoxelPosition(chunk->position) + Vector3(offset, offset, offset);
                 float size = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
                 if (frustum.cubeInFrustum(chunkCenter, size, size, size) != Frustum::FRUSTUM_OUTSIDE) {
                     renderList.push_back(chunk);

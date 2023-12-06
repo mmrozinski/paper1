@@ -38,7 +38,7 @@ public:
     std::set<Sides> fullSides = std::set<Sides>();
 
     static Vector3i voxelToChunkPosition(Vector3 position);
-    static Vector3 chunkToVoxelPosiotion(Vector3i position);
+    static Vector3 chunkToVoxelPosition(Vector3i position);
 
     Chunk(Vector3i position);
 
