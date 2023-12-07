@@ -25,7 +25,7 @@ public:
     MeshRenderer();
     explicit MeshRenderer(Shader *shader);
 
-    int addVertexToMesh(const Vector3& position, const Vector3& normal);
+    int addVertexToMesh(const Vector3& position, const Vector3& normal, const Vector3& color);
     void addTriangleToMesh(unsigned int v1, unsigned int v2, unsigned int v3);
 
     void setProjectionMatrix(const Matrix4& matrix);

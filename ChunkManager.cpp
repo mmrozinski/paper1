@@ -15,6 +15,7 @@ ChunkManager::ChunkManager() {
     _meshRenderer = new MeshRenderer();
 
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
     noise.SetSeed(static_cast<int>(time(nullptr)));
 }
 
@@ -266,7 +267,7 @@ void ChunkManager::updateRenderList(const Camera& camera) {
     }
 }
 
-void ChunkManager::update(Camera camera) {
+void ChunkManager::updateLists(const Camera& camera) {
     updateLoadList();
     updateSetupList();
     updateRebuildList();
@@ -275,21 +276,18 @@ void ChunkManager::update(Camera camera) {
     updateVisible(camera.getPosition());
 
     updateRenderList(camera);
+}
+
+void ChunkManager::update(Camera camera) {
+    updateLists(camera);
 
     _renderer->setViewMatrix(camera.getViewMatrix());
     _renderer->setProjectionMatrix(camera.getProjectionMatrix());
 }
 
-void ChunkManager::update(Camera camera, bool doListUpdates) {
+void ChunkManager::update(const Camera& camera, bool doListUpdates) {
     if (doListUpdates) {
-        updateLoadList();
-        updateSetupList();
-        updateRebuildList();
-        updateFlagsList();
-        updateUnloadList();
-        updateVisible(camera.getPosition());
-
-        updateRenderList(camera);
+        updateLists(camera);
 
         frustum.preRender(_meshRenderer);
     }

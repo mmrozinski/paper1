@@ -28,6 +28,9 @@ add_executable(paper1 main.cpp
         Frustum.cpp
         Frustum.h
         FastNoiseLite.h
+        BlockStone.h
+        BlockGrass.h
+        BlockWater.h
 )
 
 find_package(OpenGL REQUIRED)

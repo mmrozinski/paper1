@@ -3,7 +3,7 @@
 #include <algorithm>
 
 void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative,
-                               bool zPositive, float x, float y, float z, MeshRenderer* renderer) {
+                               bool zPositive, float x, float y, float z, Vector3 color, MeshRenderer* renderer) {
     Vector3 p1 = Vector3(x, y, z + Block::BLOCK_RENDER_SIZE);
     Vector3 p2 = Vector3(x + Block::BLOCK_RENDER_SIZE, y, z + Block::BLOCK_RENDER_SIZE);
     Vector3 p3 = Vector3(x + Block::BLOCK_RENDER_SIZE, y + Block::BLOCK_RENDER_SIZE, z + Block::BLOCK_RENDER_SIZE);
@@ -27,10 +27,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Front
     n = Vector3::unitZ();
     if (zPositive) {
-        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n));
-        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n));
-        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n));
-        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n));
+        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color));
+        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color));
+        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color));
+        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color));
         renderer->addTriangleToMesh(v1, v2, v3);
         renderer->addTriangleToMesh(v1, v3, v4);
     }
@@ -38,10 +38,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Back
     n = -Vector3::unitZ();
     if (zNegative) {
-        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n));
-        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n));
-        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n));
-        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n));
+        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color));
+        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color));
+        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color));
+        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color));
         renderer->addTriangleToMesh(v5, v6, v7);
         renderer->addTriangleToMesh(v5, v7, v8);
     }
@@ -49,10 +49,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Right
     n = Vector3::unitX();
     if (xPositive) {
-        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n));
-        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n));
-        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n));
-        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n));
+        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color));
+        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color));
+        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color));
+        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color));
         renderer->addTriangleToMesh(v2, v5, v8);
         renderer->addTriangleToMesh(v2, v8, v3);
     }
@@ -60,10 +60,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Left
     n = -Vector3::unitX();
     if (xNegative) {
-        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n));
-        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n));
-        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n));
-        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n));
+        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color));
+        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color));
+        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color));
+        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color));
         renderer->addTriangleToMesh(v6, v1, v4);
         renderer->addTriangleToMesh(v6, v4, v7);
     }
@@ -71,10 +71,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Top
     n = Vector3::unitY();
     if (yPositive) {
-        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n));
-        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n));
-        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n));
-        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n));
+        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color));
+        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color));
+        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color));
+        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color));
         renderer->addTriangleToMesh(v4, v3, v8);
         renderer->addTriangleToMesh(v4, v8, v7);
     }
@@ -82,10 +82,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Bottom
     n = -Vector3::unitY();
     if (yNegative) {
-        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n));
-        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n));
-        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n));
-        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n));
+        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color));
+        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color));
+        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color));
+        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color));
         renderer->addTriangleToMesh(v6, v5, v2);
         renderer->addTriangleToMesh(v6, v2, v1);
     }
@@ -153,7 +153,7 @@ int ChunkRenderer::addChunk(Vector3i position, Block* blocks[][CHUNK_SIZE][CHUNK
                 bool zPositive = true;
                 if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->active;
 
-                createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, renderer);
+                createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), renderer);
             }
         }
     }

@@ -1,10 +1,14 @@
 #include "Chunk.h"
 
+#include "BlockGrass.h"
+#include "BlockStone.h"
+#include "BlockWater.h"
+
 void Chunk::initialize() {
     for (auto&block: blocks) {
         for (auto&y: block) {
             for (auto&z: y) {
-                z = new Block();
+                z = new BlockStone();
             }
         }
     }
@@ -20,8 +24,22 @@ void Chunk::generate(FastNoiseLite noise) {
             float height = noise.GetNoise(globalPosition.x + x, globalPosition.z + z) * CHUNK_SIZE * 8;
 
             for (int y = 0; y < CHUNK_SIZE; y++) {
+                if (globalPosition.y + y < 0) {
+                    delete blocks[x][y][z];
+                    blocks[x][y][z] = new BlockWater();
+                    blocks[x][y][z]->active = true;
+                }
+
                 if (globalPosition.y + y > height) {
-                    break;
+                    continue;
+                }
+
+                if (globalPosition.y + y > height - 3 && globalPosition.y + y > 0) {
+                    delete blocks[x][y][z];
+                    blocks[x][y][z] = new BlockGrass();
+                } else {
+                    delete blocks[x][y][z];
+                    blocks[x][y][z] = new BlockStone();
                 }
                 blocks[x][y][z]->active = true;
             }

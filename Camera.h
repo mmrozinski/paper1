@@ -26,7 +26,7 @@ private:
 public:
     Camera(const Vector3& position, float aspectRatio);
 
-    Vector3 getPosition() { return _position; }
+    Vector3 getPosition() const { return _position; }
 
     void setPosition(const Vector3& position) { _position = position; }
 

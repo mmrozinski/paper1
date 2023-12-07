@@ -20,7 +20,7 @@ private:
     void updateFullSides();
 
 public:
-    static constexpr int CHUNK_SIZE = 8;
+    static constexpr int CHUNK_SIZE = 16;
 
     enum Sides { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
     static constexpr Sides allSides[] = { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };

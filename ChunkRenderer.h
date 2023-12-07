@@ -9,7 +9,7 @@
 
 class ChunkRenderer {
 private:
-    static constexpr int CHUNK_SIZE = 8;
+    static constexpr int CHUNK_SIZE = 16;
 
     std::vector<MeshRenderer*> _meshRenderers = std::vector<MeshRenderer*>();
     std::vector<int> _meshIds = std::vector<int>();
@@ -19,7 +19,7 @@ private:
 
     Shader *_shader;
 
-    static void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, MeshRenderer* renderer);
+    static void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, Vector3 color, MeshRenderer* renderer);
 
 public:
     ChunkRenderer();

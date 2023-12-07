@@ -19,7 +19,7 @@ bool firstMove = true;
 int lastPosX = 0;
 int lastPosY = 0;
 float sensitivity = 1.0f;
-float speed = 10.0f;
+float speed = 0.01f;
 
 bool doListUpdates = true;
 

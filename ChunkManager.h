@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <GL/glew.h>
 #include <GL/freeglut_std.h>
+#include <thread>
 
 #include "Camera.h"
 #include "Chunk.h"
@@ -14,7 +15,7 @@
 class ChunkManager {
 private:
     const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 16;
-    const int CHUNK_VISIBILITY_DISTANCE = 4;
+    const int CHUNK_VISIBILITY_DISTANCE = 8;
 
     const int WORLD_SIZE = 16;
     std::vector<Chunk*> masterList = std::vector<Chunk*>();
@@ -44,8 +45,9 @@ public:
     void updateUnloadList();
     void updateVisible(const Vector3& position);
     void updateRenderList(const Camera& camera);
+    void updateLists(const Camera& camera);
     void update(Camera camera);
-    void update(Camera camera, bool doListUpdates);
+    void update(const Camera& camera, bool doListUpdates);
     void render();
 
     ~ChunkManager();
