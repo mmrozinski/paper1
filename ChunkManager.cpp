@@ -10,6 +10,53 @@ Chunk* ChunkManager::getChunk(const Vector3i& position) const {
     return nullptr;
 }
 
+void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3& position) {
+    const Vector3i chunkPosition = Chunk::voxelToChunkPosition(position);
+    const Vector3i distance = chunk->position - chunkPosition;
+
+    int xDist = std::abs(distance.x);
+    int yDist = std::abs(distance.y);
+    int zDist = std::abs(distance.z);
+
+    if (!chunk->isLoaded && xDist <= CHUNK_VISIBILITY_DISTANCE && yDist <= CHUNK_VISIBILITY_DISTANCE && zDist <=
+        CHUNK_VISIBILITY_DISTANCE) {
+        loadList.push_back(chunk);
+    }
+
+    if (!chunk->isSetup) {
+        setupList.push_back(chunk);
+    }
+
+    if (chunk->needsRebuild) {
+        rebuildList.push_back(chunk);
+    }
+
+    if (xDist > CHUNK_VISIBILITY_DISTANCE || yDist > CHUNK_VISIBILITY_DISTANCE || zDist >
+        CHUNK_VISIBILITY_DISTANCE) {
+        unloadList.push_back(chunk);
+    }
+
+    if (chunk->isLoaded && chunk->isSetup && !chunk->shouldRender) {
+        flagsUpdateList.push_back(chunk);
+    }
+
+    visibleList.push_back(chunk);
+}
+
+void ChunkManager::populateMasterList(const Vector3& position, const int x, const int y, const int z) {
+    const Vector3i chunkPosition = Chunk::voxelToChunkPosition(position) + Vector3i(x, y, z);
+
+    if (Chunk* chunk = getChunk(chunkPosition); chunk == nullptr) {
+        // if (chunkPosition.x >= 0 && chunkPosition.y >= 0 && chunkPosition.z >= 0 && chunkPosition.x <
+        //     WORLD_SIZE && chunkPosition.y < WORLD_SIZE && chunkPosition.z < WORLD_SIZE) {
+        //     chunk = new Chunk(chunkPosition);
+        //     masterList.push_back(chunk);
+        // }
+        chunk = new Chunk(chunkPosition);
+        masterList.push_back(chunk);
+    }
+}
+
 ChunkManager::ChunkManager() {
     _renderer = new ChunkRenderer();
     _meshRenderer = new MeshRenderer();
@@ -21,31 +68,32 @@ ChunkManager::ChunkManager() {
 
 void ChunkManager::updateLoadList() {
     int chunksLoaded = 0;
+    std::vector<std::future<void>> loadThreads;
     for (auto chunk: loadList) {
         if (chunksLoaded >= CHUNKS_ASYNC_LIMIT_PER_FRAME) {
             break;
         }
 
         if (!chunk->isLoaded) {
-            // std::thread loadThread(&Chunk::load, chunk);
-            // loadThread.detach();
-            chunk->load();
+            loadThreads.push_back(std::async(std::launch::async, &Chunk::load, chunk));
+            //chunk->load();
             chunksLoaded++;
         }
+    }
+    for (auto&thread: loadThreads) {
+        thread.wait();
     }
     loadList.clear();
 }
 
 void ChunkManager::updateSetupList() {
-    std::vector<std::thread> setupThreads;
+    std::vector<std::future<void>> setupThreads;
     for (auto chunk: setupList) {
         if (chunk->isLoaded && !chunk->isSetup) {
-            setupThreads.emplace_back(&Chunk::setup, chunk, noise);
+            setupThreads.push_back(std::async(std::launch::async, &Chunk::setup, chunk, noise));
         }
-        for (auto& thread: setupThreads) {
-            if (thread.joinable()) {
-                thread.join();
-            }
+        for (auto&thread: setupThreads) {
+            thread.wait();
         }
     }
     setupList.clear();
@@ -53,15 +101,17 @@ void ChunkManager::updateSetupList() {
 
 void ChunkManager::updateRebuildList() {
     int chunksRebuilt = 0;
-    std::vector<std::thread> rebuildThreads;
+    std::vector<std::future<void>> rebuildThreads;
+
     for (auto chunk: rebuildList) {
         if (chunk->isLoaded && chunk->isSetup) {
             if (chunksRebuilt >= CHUNKS_ASYNC_LIMIT_PER_FRAME) {
                 break;
             }
 
+            rebuildThreads.push_back(std::async(std::launch::async, &Chunk::createMeshForRebuild, chunk, _renderer));
             //rebuildThreads.emplace_back(&Chunk::createMeshForRebuild, chunk, _renderer);
-            chunk->createMeshForRebuild(_renderer);
+            //chunk->createMeshForRebuild(_renderer);
 
             flagsUpdateList.push_back(chunk);
 
@@ -101,9 +151,10 @@ void ChunkManager::updateRebuildList() {
         }
     }
 
-    // for (auto& thread: rebuildThreads) {
-    //     thread.join();
-    // }
+    for (auto&thread: rebuildThreads) {
+        // thread.join();
+        thread.wait();
+    }
 
     for (auto chunk: rebuildList) {
         if (chunk->isLoaded && chunk->isSetup) {
@@ -213,60 +264,33 @@ void ChunkManager::updateUnloadList() {
 void ChunkManager::updateVisible(const Vector3& position) {
     visibleList.clear();
 
+    std::vector<std::future<void>> listUpdateThreads;
+    std::vector<std::future<void>> populateMasterListThreads;
+
     for (int x = -CHUNK_VISIBILITY_DISTANCE; x < CHUNK_VISIBILITY_DISTANCE; x++) {
         for (int y = -CHUNK_VISIBILITY_DISTANCE; y < CHUNK_VISIBILITY_DISTANCE; y++) {
             for (int z = -CHUNK_VISIBILITY_DISTANCE; z < CHUNK_VISIBILITY_DISTANCE; z++) {
-                Vector3i chunkPosition = Chunk::voxelToChunkPosition(position) + Vector3i(x, y, z);
-                Chunk* chunk = getChunk(chunkPosition);
-
-                if (chunk == nullptr) {
-                    // if (chunkPosition.x >= 0 && chunkPosition.y >= 0 && chunkPosition.z >= 0 && chunkPosition.x <
-                    //     WORLD_SIZE && chunkPosition.y < WORLD_SIZE && chunkPosition.z < WORLD_SIZE) {
-                    //     chunk = new Chunk(chunkPosition);
-                    //     masterList.push_back(chunk);
-                    // }
-                    chunk = new Chunk(chunkPosition);
-                    masterList.push_back(chunk);
-                }
+                //populateMasterListThreads.push_back(std::async(std::launch::async, populateMasterList, this, position, x, y, z));
+                populateMasterList(position, x, y, z);
             }
         }
     }
 
-    for (auto chunk: masterList) {
-        Vector3i chunkPosition = Chunk::voxelToChunkPosition(position);
-        Vector3i distance = chunk->position - chunkPosition;
+    for (auto& thread: populateMasterListThreads) {
+        thread.wait();
+    }
 
-        int xDist = std::abs(distance.x);
-        int yDist = std::abs(distance.y);
-        int zDist = std::abs(distance.z);
+    for (const auto chunk: masterList) {
+        listUpdateThreads.push_back(std::async(std::launch::async, prepareFlowLists, this, chunk, position));
+        //prepareFlowLists(chunk, position);
+    }
 
-        if (!chunk->isLoaded && xDist <= CHUNK_VISIBILITY_DISTANCE && yDist <= CHUNK_VISIBILITY_DISTANCE && zDist <=
-            CHUNK_VISIBILITY_DISTANCE) {
-            loadList.push_back(chunk);
-        }
-
-        if (!chunk->isSetup) {
-            setupList.push_back(chunk);
-        }
-
-        if (chunk->needsRebuild) {
-            rebuildList.push_back(chunk);
-        }
-
-        if (xDist > CHUNK_VISIBILITY_DISTANCE || yDist > CHUNK_VISIBILITY_DISTANCE || zDist >
-            CHUNK_VISIBILITY_DISTANCE) {
-            unloadList.push_back(chunk);
-        }
-
-        if (chunk->isLoaded && chunk->isSetup && !chunk->shouldRender) {
-            flagsUpdateList.push_back(chunk);
-        }
-
-        visibleList.push_back(chunk);
+    for (auto& thread: listUpdateThreads) {
+        thread.wait();
     }
 }
 
-void ChunkManager::updateRenderList(const Camera& camera) {
+void ChunkManager::updateRenderList(const Camera&camera) {
     Matrix4 projection = camera.getProjectionMatrix();
     Matrix4 view = camera.getViewMatrix();
     frustum = Frustum(view * projection);
@@ -287,7 +311,7 @@ void ChunkManager::updateRenderList(const Camera& camera) {
     }
 }
 
-void ChunkManager::updateLists(const Camera& camera) {
+void ChunkManager::updateLists(const Camera&camera) {
     updateLoadList();
     updateSetupList();
     updateRebuildList();
@@ -305,7 +329,7 @@ void ChunkManager::update(Camera camera) {
     _renderer->setProjectionMatrix(camera.getProjectionMatrix());
 }
 
-void ChunkManager::update(const Camera& camera, bool doListUpdates) {
+void ChunkManager::update(const Camera&camera, bool doListUpdates) {
     if (doListUpdates) {
         updateLists(camera);
 

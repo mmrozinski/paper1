@@ -10,9 +10,9 @@ private:
     std::vector<float> vertices = std::vector<float>();
     std::vector<unsigned int> indices = std::vector<unsigned int>();
 
-    GLuint vertexArrayObject;
-    GLuint vertexBufferObject;
-    GLuint elementBufferObject;
+    GLuint vertexArrayObject = -1;
+    GLuint vertexBufferObject = -1;
+    GLuint elementBufferObject = -1;
 
     Matrix4 model = Matrix4::createTranslation(Vector3(0.0f, 0.0f, 0.0f));
     Matrix4 view = Matrix4::createTranslation(Vector3(0.0f, 0.0f, 0.0f));
@@ -20,10 +20,13 @@ private:
 
     Shader *shader;
     bool usesExternalShader;
+    bool GLObjectsInitialized = false;
 
 public:
     MeshRenderer();
     explicit MeshRenderer(Shader *shader);
+
+    void initGLObjects();
 
     int addVertexToMesh(const Vector3& position, const Vector3& normal, const Vector3& color);
     void addTriangleToMesh(unsigned int v1, unsigned int v2, unsigned int v3);
@@ -32,7 +35,8 @@ public:
     void setViewMatrix(const Matrix4& matrix);
     void setModelMatrix(const Matrix4& matrix);
 
-    bool isEmpty();
+    bool isEmpty() const;
+    bool isGLObjectsInitialized() const;
 
     void clear();
 

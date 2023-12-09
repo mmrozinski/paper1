@@ -36,6 +36,9 @@ private:
     FastNoiseLite noise;
 
     Chunk* getChunk(const Vector3i& position) const;
+
+    void prepareFlowLists(Chunk* chunk, const Vector3& position);
+    void populateMasterList(const Vector3& position, int x, int y, int z);
 public:
     ChunkManager();
 

@@ -6,10 +6,6 @@ MeshRenderer::MeshRenderer() {
     glEnable(GL_DEPTH_TEST);
 
     shader->use();
-
-    glGenVertexArrays(1, &vertexArrayObject);
-    glGenBuffers(1, &vertexBufferObject);
-    glGenBuffers(1, &elementBufferObject);
 }
 
 MeshRenderer::MeshRenderer(Shader *shader) {
@@ -17,10 +13,14 @@ MeshRenderer::MeshRenderer(Shader *shader) {
     usesExternalShader = true;
 
     glEnable(GL_DEPTH_TEST);
+}
 
+void MeshRenderer::initGLObjects() {
     glGenVertexArrays(1, &vertexArrayObject);
     glGenBuffers(1, &vertexBufferObject);
     glGenBuffers(1, &elementBufferObject);
+
+    GLObjectsInitialized = true;
 }
 
 int MeshRenderer::addVertexToMesh(const Vector3& position, const Vector3& normal, const Vector3& color) {
@@ -58,8 +58,12 @@ void MeshRenderer::setModelMatrix(const Matrix4& matrix) {
     model = matrix;
 }
 
-bool MeshRenderer::isEmpty() {
+bool MeshRenderer::isEmpty() const {
     return vertices.empty();
+}
+
+bool MeshRenderer::isGLObjectsInitialized() const {
+    return GLObjectsInitialized;
 }
 
 void MeshRenderer::clear() {

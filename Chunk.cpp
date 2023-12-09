@@ -145,6 +145,10 @@ void Chunk::rebuildMesh(ChunkRenderer* renderer) {
         createMeshForRebuild(renderer);
     }
 
+    if (!rebuiltChunkRenderer->isGLObjectsInitialized()) {
+        rebuiltChunkRenderer->initGLObjects();
+    }
+
     meshId = renderer->addChunk(rebuiltChunkRenderer);
     updateFullSides();
     needsRebuild = false;
