@@ -27,7 +27,9 @@ public:
     void setViewMatrix(const Matrix4& matrix);
     void setProjectionMatrix(const Matrix4& matrix);
     bool isEmpty(int meshId);
-    int addChunk(Vector3i position, Block*[][CHUNK_SIZE][CHUNK_SIZE]);
+    int addChunk(const Vector3i& position, Block*[][CHUNK_SIZE][CHUNK_SIZE]);
+    int addChunk(MeshRenderer* renderer);
+    MeshRenderer* createChunkMeshToAdd(const Vector3i& position, Block*[][CHUNK_SIZE][CHUNK_SIZE]) const;
     void removeChunk(int id);
     void render(int meshId);
 

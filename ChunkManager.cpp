@@ -1,6 +1,6 @@
 #include "ChunkManager.h"
 
-Chunk* ChunkManager::getChunk(Vector3i position) {
+Chunk* ChunkManager::getChunk(const Vector3i& position) const {
     for (const auto chunk: masterList) {
         if (chunk->position == position) {
             return chunk;
@@ -27,6 +27,8 @@ void ChunkManager::updateLoadList() {
         }
 
         if (!chunk->isLoaded) {
+            // std::thread loadThread(&Chunk::load, chunk);
+            // loadThread.detach();
             chunk->load();
             chunksLoaded++;
         }
@@ -35,9 +37,15 @@ void ChunkManager::updateLoadList() {
 }
 
 void ChunkManager::updateSetupList() {
+    std::vector<std::thread> setupThreads;
     for (auto chunk: setupList) {
         if (chunk->isLoaded && !chunk->isSetup) {
-            chunk->setup(_renderer, noise);
+            setupThreads.emplace_back(&Chunk::setup, chunk, noise);
+        }
+        for (auto& thread: setupThreads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
         }
     }
     setupList.clear();
@@ -45,13 +53,15 @@ void ChunkManager::updateSetupList() {
 
 void ChunkManager::updateRebuildList() {
     int chunksRebuilt = 0;
+    std::vector<std::thread> rebuildThreads;
     for (auto chunk: rebuildList) {
         if (chunk->isLoaded && chunk->isSetup) {
             if (chunksRebuilt >= CHUNKS_ASYNC_LIMIT_PER_FRAME) {
                 break;
             }
 
-            chunk->rebuildMesh(_renderer);
+            //rebuildThreads.emplace_back(&Chunk::createMeshForRebuild, chunk, _renderer);
+            chunk->createMeshForRebuild(_renderer);
 
             flagsUpdateList.push_back(chunk);
 
@@ -88,6 +98,16 @@ void ChunkManager::updateRebuildList() {
             }
 
             chunksRebuilt++;
+        }
+    }
+
+    // for (auto& thread: rebuildThreads) {
+    //     thread.join();
+    // }
+
+    for (auto chunk: rebuildList) {
+        if (chunk->isLoaded && chunk->isSetup) {
+            chunk->rebuildMesh(_renderer);
         }
     }
 

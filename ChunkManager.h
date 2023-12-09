@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut_std.h>
 #include <thread>
+#include <future>
 
 #include "Camera.h"
 #include "Chunk.h"
@@ -34,7 +35,7 @@ private:
     Frustum frustum;
     FastNoiseLite noise;
 
-    Chunk* getChunk(Vector3i position);
+    Chunk* getChunk(const Vector3i& position) const;
 public:
     ChunkManager();
 

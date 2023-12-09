@@ -120,7 +120,7 @@ bool ChunkRenderer::isEmpty(int meshId) {
     return true;
 }
 
-int ChunkRenderer::addChunk(Vector3i position, Block* blocks[][CHUNK_SIZE][CHUNK_SIZE]) {
+int ChunkRenderer::addChunk(const Vector3i& position, Block* blocks[][CHUNK_SIZE][CHUNK_SIZE]) { // make a version of this that just makes a new MeshRenderer to parllelize
     auto* renderer = new MeshRenderer(_shader);
     renderer->setViewMatrix(_view);
     renderer->setProjectionMatrix(_projection);
@@ -131,33 +131,37 @@ int ChunkRenderer::addChunk(Vector3i position, Block* blocks[][CHUNK_SIZE][CHUNK
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int y = 0; y < CHUNK_SIZE; y++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-                if (!blocks[x][y][z]->active) {
+                if (!blocks[x][y][z]->isActive()) {
                     continue;
                 }
 
                 bool xNegative = true;
-                if (x > 0) xNegative = !blocks[x - 1][y][z]->active;
+                if (x > 0) xNegative = !blocks[x - 1][y][z]->isActive();
 
                 bool xPositive = true;
-                if (x < CHUNK_SIZE - 1) xPositive = !blocks[x + 1][y][z]->active;
+                if (x < CHUNK_SIZE - 1) xPositive = !blocks[x + 1][y][z]->isActive();
 
                 bool yNegative = true;
-                if (y > 0) yNegative = !blocks[x][y - 1][z]->active;
+                if (y > 0) yNegative = !blocks[x][y - 1][z]->isActive();
 
                 bool yPositive = true;
-                if (y < CHUNK_SIZE - 1) yPositive = !blocks[x][y + 1][z]->active;
+                if (y < CHUNK_SIZE - 1) yPositive = !blocks[x][y + 1][z]->isActive();
 
                 bool zNegative = true;
-                if (z > 0) zNegative = !blocks[x][y][z - 1]->active;
+                if (z > 0) zNegative = !blocks[x][y][z - 1]->isActive();
 
                 bool zPositive = true;
-                if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->active;
+                if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
 
                 createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), renderer);
             }
         }
     }
 
+    return addChunk(renderer);
+}
+
+int ChunkRenderer::addChunk(MeshRenderer* renderer) {
     _meshRenderers.push_back(renderer);
 
     if (_meshIds.empty()) {
@@ -172,11 +176,53 @@ int ChunkRenderer::addChunk(Vector3i position, Block* blocks[][CHUNK_SIZE][CHUNK
     return max;
 }
 
+MeshRenderer* ChunkRenderer::createChunkMeshToAdd(const Vector3i& position, Block* blocks[][CHUNK_SIZE][CHUNK_SIZE]) const {
+    auto* renderer = new MeshRenderer(_shader);
+    renderer->setViewMatrix(_view);
+    renderer->setProjectionMatrix(_projection);
+    renderer->setModelMatrix(
+        Matrix4::createTranslation(
+            static_cast<Vector3>(position) * CHUNK_SIZE * Block::BLOCK_RENDER_SIZE));
+
+    for (int x = 0; x < CHUNK_SIZE; x++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+            for (int z = 0; z < CHUNK_SIZE; z++) {
+                if (!blocks[x][y][z]->isActive()) {
+                    continue;
+                }
+
+                bool xNegative = true;
+                if (x > 0) xNegative = !blocks[x - 1][y][z]->isActive();
+
+                bool xPositive = true;
+                if (x < CHUNK_SIZE - 1) xPositive = !blocks[x + 1][y][z]->isActive();
+
+                bool yNegative = true;
+                if (y > 0) yNegative = !blocks[x][y - 1][z]->isActive();
+
+                bool yPositive = true;
+                if (y < CHUNK_SIZE - 1) yPositive = !blocks[x][y + 1][z]->isActive();
+
+                bool zNegative = true;
+                if (z > 0) zNegative = !blocks[x][y][z - 1]->isActive();
+
+                bool zPositive = true;
+                if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
+
+                createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), renderer);
+            }
+        }
+    }
+
+    return renderer;
+}
+
 void ChunkRenderer::removeChunk(int id) {
     auto it = std::find(_meshIds.begin(), _meshIds.end(), id);
     if (it != _meshIds.end()) {
         int index = it - _meshIds.begin();
         _meshIds.erase(it);
+        delete _meshRenderers.at(index);
         _meshRenderers.erase(_meshRenderers.begin() + index);
     }
 }

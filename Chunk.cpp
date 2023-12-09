@@ -16,7 +16,7 @@ void Chunk::initialize() {
     isInitialized = true;
 }
 
-void Chunk::generate(FastNoiseLite noise) {
+void Chunk::generate(const FastNoiseLite& noise) {
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
             Vector3 globalPosition = chunkToVoxelPosition(position);
@@ -27,7 +27,7 @@ void Chunk::generate(FastNoiseLite noise) {
                 if (globalPosition.y + y < 0) {
                     delete blocks[x][y][z];
                     blocks[x][y][z] = new BlockWater();
-                    blocks[x][y][z]->active = true;
+                    blocks[x][y][z]->setActive(true);
                 }
 
                 if (globalPosition.y + y > height) {
@@ -41,7 +41,7 @@ void Chunk::generate(FastNoiseLite noise) {
                     delete blocks[x][y][z];
                     blocks[x][y][z] = new BlockStone();
                 }
-                blocks[x][y][z]->active = true;
+                blocks[x][y][z]->setActive(true);
             }
         }
     }
@@ -58,19 +58,19 @@ void Chunk::updateFullSides() {
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int y = 0; y < CHUNK_SIZE; y++) {
-            if (!blocks[x][y][0]->active) {
+            if (!blocks[x][y][0]->isActive()) {
                 fullSides.erase(SOUTH);
             }
-            if (!blocks[x][y][CHUNK_SIZE - 1]->active) {
+            if (!blocks[x][y][CHUNK_SIZE - 1]->isActive()) {
                 fullSides.erase(NORTH);
             }
         }
 
         for (int z = 0; z < CHUNK_SIZE; z++) {
-            if (!blocks[x][0][z]->active) {
+            if (!blocks[x][0][z]->isActive()) {
                 fullSides.erase(BOTTOM);
             }
-            if (!blocks[x][CHUNK_SIZE - 1][z]->active) {
+            if (!blocks[x][CHUNK_SIZE - 1][z]->isActive()) {
                 fullSides.erase(TOP);
             }
         }
@@ -78,10 +78,10 @@ void Chunk::updateFullSides() {
 
     for (int y = 0; y < CHUNK_SIZE; y++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
-            if (!blocks[0][y][z]->active) {
+            if (!blocks[0][y][z]->isActive()) {
                 fullSides.erase(EAST);
             }
-            if (!blocks[CHUNK_SIZE - 1][y][z]->active) {
+            if (!blocks[CHUNK_SIZE - 1][y][z]->isActive()) {
                 fullSides.erase(WEST);
             }
         }
@@ -124,16 +124,16 @@ void Chunk::unload(ChunkRenderer* renderer) {
     shouldRender = false;
 }
 
-void Chunk::setup(ChunkRenderer* renderer, FastNoiseLite noise) {
+void Chunk::setup(const FastNoiseLite& noise) {
     if (!isInitialized) {
         initialize();
     }
     if (!isGenerated) {
         generate(noise);
     }
-    meshId = renderer->addChunk(position, blocks);
     updateFullSides();
     isSetup = true;
+    needsRebuild = true;
 }
 
 void Chunk::rebuildMesh(ChunkRenderer* renderer) {
@@ -141,9 +141,17 @@ void Chunk::rebuildMesh(ChunkRenderer* renderer) {
         renderer->removeChunk(meshId);
     }
 
-    meshId = renderer->addChunk(position, blocks);
+    if (rebuiltChunkRenderer == nullptr) {
+        createMeshForRebuild(renderer);
+    }
+
+    meshId = renderer->addChunk(rebuiltChunkRenderer);
     updateFullSides();
     needsRebuild = false;
+}
+
+void Chunk::createMeshForRebuild(const ChunkRenderer* renderer) {
+    rebuiltChunkRenderer = renderer->createChunkMeshToAdd(position, blocks);
 }
 
 void Chunk::updateRenderFlags(ChunkRenderer* renderer) {

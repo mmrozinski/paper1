@@ -4,10 +4,20 @@
 
 
 class Block {
+private:
+    bool active = false;
 public:
     static constexpr float BLOCK_RENDER_SIZE = 1.0f;
-    bool active = false;
+
     virtual Vector3 getColor() const = 0;
+
+    bool isActive() const {
+        return active;
+    }
+
+    void setActive(const bool active) {
+        this->active = active;
+    }
 };
 
 

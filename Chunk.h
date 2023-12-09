@@ -13,10 +13,11 @@ private:
     bool isInitialized = false;
     bool isGenerated = false;
 
+    MeshRenderer* rebuiltChunkRenderer = nullptr;
     int meshId = -1;
 
     void initialize();
-    void generate(FastNoiseLite noise);
+    void generate(const FastNoiseLite& noise);
     void updateFullSides();
 
 public:
@@ -44,8 +45,9 @@ public:
 
     void load();
     void unload(ChunkRenderer* renderer);
-    void setup(ChunkRenderer* renderer, FastNoiseLite noise);
+    void setup(const FastNoiseLite& noise);
     void rebuildMesh(ChunkRenderer* renderer);
+    void createMeshForRebuild(const ChunkRenderer* renderer);
     void updateRenderFlags(ChunkRenderer* renderer);
     void render(ChunkRenderer* renderer) const;
 
