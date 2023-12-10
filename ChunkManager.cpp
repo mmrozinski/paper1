@@ -1,6 +1,6 @@
 #include "ChunkManager.h"
 
-Chunk* ChunkManager::getChunk(const Vector3i& position) const {
+Chunk* ChunkManager::getChunk(const Vector3i&position) const {
     for (const auto chunk: masterList) {
         if (chunk->position == position) {
             return chunk;
@@ -10,7 +10,7 @@ Chunk* ChunkManager::getChunk(const Vector3i& position) const {
     return nullptr;
 }
 
-void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3& position) {
+void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3&position) {
     const Vector3i chunkPosition = Chunk::voxelToChunkPosition(position);
     const Vector3i distance = chunk->position - chunkPosition;
 
@@ -20,30 +20,30 @@ void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3& position) {
 
     if (!chunk->isLoaded && xDist <= CHUNK_VISIBILITY_DISTANCE && yDist <= CHUNK_VISIBILITY_DISTANCE && zDist <=
         CHUNK_VISIBILITY_DISTANCE) {
-        loadList.push_back(chunk);
+        loadList.insert(chunk);
     }
 
     if (!chunk->isSetup) {
-        setupList.push_back(chunk);
+        setupList.insert(chunk);
     }
 
     if (chunk->needsRebuild) {
-        rebuildList.push_back(chunk);
+        rebuildList.insert(chunk);
     }
 
     if (xDist > CHUNK_VISIBILITY_DISTANCE || yDist > CHUNK_VISIBILITY_DISTANCE || zDist >
         CHUNK_VISIBILITY_DISTANCE) {
-        unloadList.push_back(chunk);
+        unloadList.insert(chunk);
     }
 
     if (chunk->isLoaded && chunk->isSetup && !chunk->shouldRender) {
-        flagsUpdateList.push_back(chunk);
+        flagsUpdateList.insert(chunk);
     }
 
-    visibleList.push_back(chunk);
+    visibleList.insert(chunk);
 }
 
-void ChunkManager::populateMasterList(const Vector3& position, const int x, const int y, const int z) {
+void ChunkManager::populateMasterList(const Vector3&position, const int x, const int y, const int z) {
     const Vector3i chunkPosition = Chunk::voxelToChunkPosition(position) + Vector3i(x, y, z);
 
     if (Chunk* chunk = getChunk(chunkPosition); chunk == nullptr) {
@@ -53,7 +53,80 @@ void ChunkManager::populateMasterList(const Vector3& position, const int x, cons
         //     masterList.push_back(chunk);
         // }
         chunk = new Chunk(chunkPosition);
-        masterList.push_back(chunk);
+        masterList.insert(chunk);
+    }
+}
+
+void ChunkManager::optimizeForNeighbour(Chunk* chunk) const {
+    chunk->updateRenderFlags(_renderer);
+
+    if (chunk->shouldRender) {
+        Chunk* neighbour = nullptr;
+        bool isSurrounded = true;
+
+        neighbour = getChunk(chunk->position + Vector3i(-1, 0, 0));
+        if (neighbour != nullptr && isSurrounded) {
+            if (!neighbour->fullSides.contains(Chunk::Sides::WEST)) {
+                isSurrounded = false;
+            }
+        }
+        else {
+            isSurrounded = false;
+        }
+
+        neighbour = getChunk(chunk->position + Vector3i(1, 0, 0));
+        if (neighbour != nullptr && isSurrounded) {
+            if (!neighbour->fullSides.contains(Chunk::Sides::EAST)) {
+                isSurrounded = false;
+            }
+        }
+        else {
+            isSurrounded = false;
+        }
+
+        neighbour = getChunk(chunk->position + Vector3i(0, -1, 0));
+        if (neighbour != nullptr && isSurrounded) {
+            if (!neighbour->fullSides.contains(Chunk::Sides::TOP)) {
+                isSurrounded = false;
+            }
+        }
+        else {
+            isSurrounded = false;
+        }
+
+        neighbour = getChunk(chunk->position + Vector3i(0, 1, 0));
+        if (neighbour != nullptr && isSurrounded) {
+            if (!neighbour->fullSides.contains(Chunk::Sides::BOTTOM)) {
+                isSurrounded = false;
+            }
+        }
+        else {
+            isSurrounded = false;
+        }
+
+        neighbour = getChunk(chunk->position + Vector3i(0, 0, -1));
+        if (neighbour != nullptr && isSurrounded) {
+            if (!neighbour->fullSides.contains(Chunk::Sides::NORTH)) {
+                isSurrounded = false;
+            }
+        }
+        else {
+            isSurrounded = false;
+        }
+
+        neighbour = getChunk(chunk->position + Vector3i(0, 0, 1));
+        if (neighbour != nullptr && isSurrounded) {
+            if (!neighbour->fullSides.contains(Chunk::Sides::SOUTH)) {
+                isSurrounded = false;
+            }
+        }
+        else {
+            isSurrounded = false;
+        }
+
+        if (isSurrounded) {
+            chunk->shouldRender = false;
+        }
     }
 }
 
@@ -76,11 +149,11 @@ void ChunkManager::updateLoadList() {
 
         if (!chunk->isLoaded) {
             loadThreads.push_back(std::async(std::launch::async, &Chunk::load, chunk));
-            //chunk->load();
             chunksLoaded++;
         }
     }
-    for (auto&thread: loadThreads) {
+
+    for (auto& thread: loadThreads) {
         thread.wait();
     }
     loadList.clear();
@@ -92,9 +165,10 @@ void ChunkManager::updateSetupList() {
         if (chunk->isLoaded && !chunk->isSetup) {
             setupThreads.push_back(std::async(std::launch::async, &Chunk::setup, chunk, noise));
         }
-        for (auto&thread: setupThreads) {
-            thread.wait();
-        }
+    }
+
+    for (auto& thread: setupThreads) {
+        thread.wait();
     }
     setupList.clear();
 }
@@ -110,41 +184,39 @@ void ChunkManager::updateRebuildList() {
             }
 
             rebuildThreads.push_back(std::async(std::launch::async, &Chunk::createMeshForRebuild, chunk, _renderer));
-            //rebuildThreads.emplace_back(&Chunk::createMeshForRebuild, chunk, _renderer);
-            //chunk->createMeshForRebuild(_renderer);
 
-            flagsUpdateList.push_back(chunk);
+            flagsUpdateList.insert(chunk);
 
             Chunk* neighbour = nullptr;
 
             neighbour = getChunk(chunk->position + Vector3i(-1, 0, 0));
             if (neighbour != nullptr) {
-                flagsUpdateList.push_back(neighbour);
+                flagsUpdateList.insert(neighbour);
             }
 
             neighbour = getChunk(chunk->position + Vector3i(1, 0, 0));
             if (neighbour != nullptr) {
-                flagsUpdateList.push_back(neighbour);
+                flagsUpdateList.insert(neighbour);
             }
 
             neighbour = getChunk(chunk->position + Vector3i(0, -1, 0));
             if (neighbour != nullptr) {
-                flagsUpdateList.push_back(neighbour);
+                flagsUpdateList.insert(neighbour);
             }
 
             neighbour = getChunk(chunk->position + Vector3i(0, 1, 0));
             if (neighbour != nullptr) {
-                flagsUpdateList.push_back(neighbour);
+                flagsUpdateList.insert(neighbour);
             }
 
             neighbour = getChunk(chunk->position + Vector3i(0, 0, -1));
             if (neighbour != nullptr) {
-                flagsUpdateList.push_back(neighbour);
+                flagsUpdateList.insert(neighbour);
             }
 
             neighbour = getChunk(chunk->position + Vector3i(0, 0, 1));
             if (neighbour != nullptr) {
-                flagsUpdateList.push_back(neighbour);
+                flagsUpdateList.insert(neighbour);
             }
 
             chunksRebuilt++;
@@ -152,7 +224,6 @@ void ChunkManager::updateRebuildList() {
     }
 
     for (auto&thread: rebuildThreads) {
-        // thread.join();
         thread.wait();
     }
 
@@ -166,79 +237,18 @@ void ChunkManager::updateRebuildList() {
 }
 
 void ChunkManager::updateFlagsList() {
-    for (auto chunk: flagsUpdateList) {
-        chunk->updateRenderFlags(_renderer);
+    std::vector<std::future<void>> updateFlagsThreads;
 
-        if (chunk->shouldRender) {
-            Chunk* neighbour = nullptr;
-            bool isSurrounded = true;
-
-            neighbour = getChunk(chunk->position + Vector3i(-1, 0, 0));
-            if (neighbour != nullptr && isSurrounded) {
-                if (!neighbour->fullSides.contains(Chunk::Sides::WEST)) {
-                    isSurrounded = false;
-                }
-            }
-            else {
-                isSurrounded = false;
-            }
-
-            neighbour = getChunk(chunk->position + Vector3i(1, 0, 0));
-            if (neighbour != nullptr && isSurrounded) {
-                if (!neighbour->fullSides.contains(Chunk::Sides::EAST)) {
-                    isSurrounded = false;
-                }
-            }
-            else {
-                isSurrounded = false;
-            }
-
-            neighbour = getChunk(chunk->position + Vector3i(0, -1, 0));
-            if (neighbour != nullptr && isSurrounded) {
-                if (!neighbour->fullSides.contains(Chunk::Sides::TOP)) {
-                    isSurrounded = false;
-                }
-            }
-            else {
-                isSurrounded = false;
-            }
-
-            neighbour = getChunk(chunk->position + Vector3i(0, 1, 0));
-            if (neighbour != nullptr && isSurrounded) {
-                if (!neighbour->fullSides.contains(Chunk::Sides::BOTTOM)) {
-                    isSurrounded = false;
-                }
-            }
-            else {
-                isSurrounded = false;
-            }
-
-            neighbour = getChunk(chunk->position + Vector3i(0, 0, -1));
-            if (neighbour != nullptr && isSurrounded) {
-                if (!neighbour->fullSides.contains(Chunk::Sides::NORTH)) {
-                    isSurrounded = false;
-                }
-            }
-            else {
-                isSurrounded = false;
-            }
-
-            neighbour = getChunk(chunk->position + Vector3i(0, 0, 1));
-            if (neighbour != nullptr && isSurrounded) {
-                if (!neighbour->fullSides.contains(Chunk::Sides::SOUTH)) {
-                    isSurrounded = false;
-                }
-            }
-            else {
-                isSurrounded = false;
-            }
-
-            if (isSurrounded) {
-                chunk->shouldRender = false;
-            }
-        }
-        flagsUpdateList.clear();
+    for (const auto chunk: flagsUpdateList) {
+        //updateFlagsThreads.push_back(std::async(std::launch::async, optimizeForNeighbour, this, chunk));
+        optimizeForNeighbour(chunk);
     }
+
+    for (auto&thread: updateFlagsThreads) {
+        thread.wait();
+    }
+
+    flagsUpdateList.clear();
 }
 
 void ChunkManager::updateUnloadList() {
@@ -247,50 +257,46 @@ void ChunkManager::updateUnloadList() {
             chunk->unload(_renderer);
         }
 
-        masterList.erase(std::remove(masterList.begin(), masterList.end(), chunk), masterList.end());
-        // loadList.erase(std::remove(loadList.begin(), loadList.end(), chunk), loadList.end());
-        // setupList.erase(std::remove(setupList.begin(), setupList.end(), chunk), setupList.end());
-        // rebuildList.erase(std::remove(rebuildList.begin(), rebuildList.end(), chunk), rebuildList.end());
-        // flagsUpdateList.erase(std::remove(flagsUpdateList.begin(), flagsUpdateList.end(), chunk), flagsUpdateList.end());
-        // unloadList.erase(std::remove(unloadList.begin(), unloadList.end(), chunk), unloadList.end());
-        // visibleList.erase(std::remove(visibleList.begin(), visibleList.end(), chunk), visibleList.end());
-        // renderList.erase(std::remove(renderList.begin(), renderList.end(), chunk), renderList.end());
-        //
-        // delete chunk;
+        masterList.erase(chunk);
+
+        delete chunk;
     }
     unloadList.clear();
 }
 
-void ChunkManager::updateVisible(const Vector3& position) {
+void ChunkManager::updateVisible(const Vector3&position) {
     visibleList.clear();
 
     std::vector<std::future<void>> listUpdateThreads;
     std::vector<std::future<void>> populateMasterListThreads;
 
-    for (int x = -CHUNK_VISIBILITY_DISTANCE; x < CHUNK_VISIBILITY_DISTANCE; x++) {
-        for (int y = -CHUNK_VISIBILITY_DISTANCE; y < CHUNK_VISIBILITY_DISTANCE; y++) {
-            for (int z = -CHUNK_VISIBILITY_DISTANCE; z < CHUNK_VISIBILITY_DISTANCE; z++) {
-                //populateMasterListThreads.push_back(std::async(std::launch::async, populateMasterList, this, position, x, y, z));
-                populateMasterList(position, x, y, z);
+    if (const Vector3i currentPosition = Chunk::voxelToChunkPosition(position); lastPosition != currentPosition) {
+        lastPosition = currentPosition;
+        for (int x = -CHUNK_VISIBILITY_DISTANCE; x < CHUNK_VISIBILITY_DISTANCE; x++) {
+            for (int y = -CHUNK_VISIBILITY_DISTANCE; y < CHUNK_VISIBILITY_DISTANCE; y++) {
+                for (int z = -CHUNK_VISIBILITY_DISTANCE; z < CHUNK_VISIBILITY_DISTANCE; z++) {
+                    //populateMasterListThreads.push_back(std::async(std::launch::async, populateMasterList, this, position, x, y, z));
+                    populateMasterList(position, x, y, z);
+                }
             }
         }
     }
 
-    for (auto& thread: populateMasterListThreads) {
+    for (auto&thread: populateMasterListThreads) {
         thread.wait();
     }
 
     for (const auto chunk: masterList) {
-        listUpdateThreads.push_back(std::async(std::launch::async, prepareFlowLists, this, chunk, position));
-        //prepareFlowLists(chunk, position);
+        //listUpdateThreads.push_back(std::async(std::launch::async, &prepareFlowLists, this, chunk, position));
+        prepareFlowLists(chunk, position);
     }
 
-    for (auto& thread: listUpdateThreads) {
+    for (auto&thread: listUpdateThreads) {
         thread.wait();
     }
 }
 
-void ChunkManager::updateRenderList(const Camera&camera) {
+void ChunkManager::updateRenderList(const Camera& camera) {
     Matrix4 projection = camera.getProjectionMatrix();
     Matrix4 view = camera.getViewMatrix();
     frustum = Frustum(view * projection);
@@ -304,34 +310,36 @@ void ChunkManager::updateRenderList(const Camera&camera) {
                 Vector3 chunkCenter = Chunk::chunkToVoxelPosition(chunk->position) + Vector3(offset, offset, offset);
                 float size = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
                 if (frustum.cubeInFrustum(chunkCenter, size, size, size) != Frustum::FRUSTUM_OUTSIDE) {
-                    renderList.push_back(chunk);
+                    renderList.insert(chunk);
                 }
             }
         }
     }
 }
 
-void ChunkManager::updateLists(const Camera&camera) {
-    updateLoadList();
-    updateSetupList();
-    updateRebuildList();
-    updateFlagsList();
-    updateUnloadList();
-    updateVisible(camera.getPosition());
+void ChunkManager::updateLists(const Camera& camera, bool doTickUpdates) {
+    if (doTickUpdates) {
+        updateLoadList();
+        updateSetupList();
+        updateRebuildList();
+        updateFlagsList();
+        updateUnloadList();
+        updateVisible(camera.getPosition());
+    }
 
     updateRenderList(camera);
 }
 
-void ChunkManager::update(Camera camera) {
-    updateLists(camera);
+void ChunkManager::update(const Camera& camera) {
+    updateLists(camera, true);
 
     _renderer->setViewMatrix(camera.getViewMatrix());
     _renderer->setProjectionMatrix(camera.getProjectionMatrix());
 }
 
-void ChunkManager::update(const Camera&camera, bool doListUpdates) {
+void ChunkManager::update(const Camera& camera, bool doListUpdates, bool doTickUpdates) {
     if (doListUpdates) {
-        updateLists(camera);
+        updateLists(camera, doTickUpdates);
 
         frustum.preRender(_meshRenderer);
     }

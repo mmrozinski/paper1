@@ -15,19 +15,19 @@
 
 class ChunkManager {
 private:
-    const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 16;
+    const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 1024;
     const int CHUNK_VISIBILITY_DISTANCE = 8;
 
     const int WORLD_SIZE = 16;
-    std::vector<Chunk*> masterList = std::vector<Chunk*>();
+    std::set<Chunk*> masterList = std::set<Chunk*>();
 
-    std::vector<Chunk*> loadList = std::vector<Chunk*>();
-    std::vector<Chunk*> setupList = std::vector<Chunk*>();
-    std::vector<Chunk*> rebuildList = std::vector<Chunk*>();
-    std::vector<Chunk*> flagsUpdateList = std::vector<Chunk*>();
-    std::vector<Chunk*> unloadList = std::vector<Chunk*>();
-    std::vector<Chunk*> visibleList = std::vector<Chunk*>();
-    std::vector<Chunk*> renderList = std::vector<Chunk*>();
+    std::set<Chunk*> loadList = std::set<Chunk*>();
+    std::set<Chunk*> setupList = std::set<Chunk*>();
+    std::set<Chunk*> rebuildList = std::set<Chunk*>();
+    std::set<Chunk*> flagsUpdateList = std::set<Chunk*>();
+    std::set<Chunk*> unloadList = std::set<Chunk*>();
+    std::set<Chunk*> visibleList = std::set<Chunk*>();
+    std::set<Chunk*> renderList = std::set<Chunk*>();
 
     ChunkRenderer* _renderer;
     MeshRenderer* _meshRenderer;
@@ -35,10 +35,13 @@ private:
     Frustum frustum;
     FastNoiseLite noise;
 
+    Vector3i lastPosition = Vector3i(99, 99, 99);
+
     Chunk* getChunk(const Vector3i& position) const;
 
     void prepareFlowLists(Chunk* chunk, const Vector3& position);
     void populateMasterList(const Vector3& position, int x, int y, int z);
+    void optimizeForNeighbour(Chunk* chunk) const;
 public:
     ChunkManager();
 
@@ -49,9 +52,9 @@ public:
     void updateUnloadList();
     void updateVisible(const Vector3& position);
     void updateRenderList(const Camera& camera);
-    void updateLists(const Camera& camera);
-    void update(Camera camera);
-    void update(const Camera& camera, bool doListUpdates);
+    void updateLists(const Camera& camera, bool doTickUpdates);
+    void update(const Camera& camera);
+    void update(const Camera& camera, bool doListUpdates, bool doTickUpdates);
     void render();
 
     ~ChunkManager();

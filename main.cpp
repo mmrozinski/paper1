@@ -10,6 +10,8 @@
 int win_height = 600;
 int win_width = 800;
 
+int tickDelay = 100;
+
 int frame = 0, deltaTime, timebase = 0;
 int keyboardTime, keyboardTimebase = 0;
 double fps;
@@ -93,10 +95,16 @@ void handleResize(int sizeX, int sizeY) {
     win_height = sizeY;
 }
 
-void handleUpdate(int) {
-    chunkManager->update(camera, doListUpdates);
+void handleUpdateTick(int) {
+    chunkManager->update(camera, doListUpdates, true);
 
-    glutTimerFunc(10, handleUpdate, 0);
+    glutTimerFunc(tickDelay, handleUpdateTick, 0);
+}
+
+void handleUpdateSubTick(int) {
+    chunkManager->update(camera, doListUpdates, false);
+
+    glutTimerFunc(1, handleUpdateSubTick, 0);
 }
 
 void handleMouseMove(int x, int y) {
@@ -140,7 +148,8 @@ void initGLUT(int *argc, char **argv) {
     glutReshapeFunc(handleResize);
     glutPassiveMotionFunc(handleMouseMove);
     glutTimerFunc(1000 / fps_cap, timer, 0);
-    glutTimerFunc(10, handleUpdate, 0);
+    glutTimerFunc(tickDelay, handleUpdateTick, 0);
+    glutTimerFunc(1, handleUpdateSubTick, 0);
 
     keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, nullptr, 0);
 

@@ -23,5 +23,5 @@ Matrix4 Camera::getViewMatrix() const {
 }
 
 Matrix4 Camera::getProjectionMatrix() const {
-    return Matrix4::createPerspectiveFieldOfView(_fov, _aspectRatio, 0.01f, 200.0f);
+    return Matrix4::createPerspectiveFieldOfView(_fov, _aspectRatio, 0.01f, 20000.0f);
 }
