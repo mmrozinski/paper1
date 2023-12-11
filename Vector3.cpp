@@ -13,6 +13,12 @@ Vector3::Vector3(const Vector3& vector3) {
     this->z = vector3.z;
 }
 
+Vector3::Vector3(const Vector3i& vector3i) {
+    this->x = vector3i.x;
+    this->y = vector3i.y;
+    this->z = vector3i.z;
+}
+
 Vector3::Vector3(const float x, const float y, const float z) {
     this->x = x;
     this->y = y;

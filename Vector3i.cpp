@@ -7,6 +7,12 @@ Vector3i::Vector3i() {
     z = 0;
 }
 
+Vector3i::Vector3i(const Vector3& vec) {
+    x = floorf(vec.x);
+    y = floorf(vec.y);
+    z = floorf(vec.z);
+}
+
 Vector3i::Vector3i(const int x, const int y, const int z) {
     this->x = x;
     this->y = y;

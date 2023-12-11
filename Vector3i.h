@@ -2,12 +2,15 @@
 #define Vector3I_H
 #include "Vector3.h"
 
+struct  Vector3;
 
-class Vector3i {
+struct Vector3i {
 public:
     int x, y, z;
 
     Vector3i();
+
+    Vector3i(const Vector3& vec);
 
     Vector3i(int, int, int);
 

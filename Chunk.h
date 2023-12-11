@@ -21,7 +21,7 @@ private:
     void updateFullSides();
 
 public:
-    static constexpr int CHUNK_SIZE = 16;
+    static constexpr int CHUNK_SIZE = 16; // TODO: merge this with the one in ChunkRenderer.h
 
     enum Sides { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
     static constexpr Sides allSides[] = { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
@@ -38,8 +38,10 @@ public:
 
     std::set<Sides> fullSides = std::set<Sides>();
 
-    static Vector3i voxelToChunkPosition(const Vector3& position);
-    static Vector3 chunkToVoxelPosition(Vector3i position);
+    static Vector3i worldToChunkPosition(const Vector3& position);
+    static Vector3 chunkToWorldPosition(const Vector3i& position);
+    static Vector3i worldToBlockPosition(const Vector3& position);
+    static Vector3i worldPositionToLocalBlockOffset(const Vector3& position);
 
     explicit Chunk(Vector3i position);
 
@@ -50,6 +52,8 @@ public:
     void createMeshForRebuild(const ChunkRenderer* renderer);
     void updateRenderFlags(ChunkRenderer* renderer);
     void render(ChunkRenderer* renderer) const;
+
+    void breakBlock(const Vector3i& position);
 
     ~Chunk();
 };

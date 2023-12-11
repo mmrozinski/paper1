@@ -1,5 +1,7 @@
 #include "ChunkManager.h"
 
+#include "RayCaster.h"
+
 Chunk* ChunkManager::getChunk(const Vector3i&position) const {
     for (const auto chunk: masterList) {
         if (chunk->position == position) {
@@ -11,7 +13,7 @@ Chunk* ChunkManager::getChunk(const Vector3i&position) const {
 }
 
 void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3&position) {
-    const Vector3i chunkPosition = Chunk::voxelToChunkPosition(position);
+    const Vector3i chunkPosition = Chunk::worldToChunkPosition(position);
     const Vector3i distance = chunk->position - chunkPosition;
 
     int xDist = std::abs(distance.x);
@@ -44,13 +46,13 @@ void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3&position) {
 }
 
 void ChunkManager::populateMasterList(const Vector3&position, const int x, const int y, const int z) {
-    const Vector3i chunkPosition = Chunk::voxelToChunkPosition(position) + Vector3i(x, y, z);
+    const Vector3i chunkPosition = Chunk::worldToChunkPosition(position) + Vector3i(x, y, z);
 
     if (Chunk* chunk = getChunk(chunkPosition); chunk == nullptr) {
         // if (chunkPosition.x >= 0 && chunkPosition.y >= 0 && chunkPosition.z >= 0 && chunkPosition.x <
         //     WORLD_SIZE && chunkPosition.y < WORLD_SIZE && chunkPosition.z < WORLD_SIZE) {
         //     chunk = new Chunk(chunkPosition);
-        //     masterList.push_back(chunk);
+        //     masterList.insert(chunk);
         // }
         chunk = new Chunk(chunkPosition);
         masterList.insert(chunk);
@@ -153,7 +155,7 @@ void ChunkManager::updateLoadList() {
         }
     }
 
-    for (auto& thread: loadThreads) {
+    for (auto&thread: loadThreads) {
         thread.wait();
     }
     loadList.clear();
@@ -167,7 +169,7 @@ void ChunkManager::updateSetupList() {
         }
     }
 
-    for (auto& thread: setupThreads) {
+    for (auto&thread: setupThreads) {
         thread.wait();
     }
     setupList.clear();
@@ -270,7 +272,7 @@ void ChunkManager::updateVisible(const Vector3&position) {
     std::vector<std::future<void>> listUpdateThreads;
     std::vector<std::future<void>> populateMasterListThreads;
 
-    if (const Vector3i currentPosition = Chunk::voxelToChunkPosition(position); lastPosition != currentPosition) {
+    if (const Vector3i currentPosition = Chunk::worldToChunkPosition(position); lastPosition != currentPosition) {
         lastPosition = currentPosition;
         for (int x = -CHUNK_VISIBILITY_DISTANCE; x < CHUNK_VISIBILITY_DISTANCE; x++) {
             for (int y = -CHUNK_VISIBILITY_DISTANCE; y < CHUNK_VISIBILITY_DISTANCE; y++) {
@@ -296,7 +298,7 @@ void ChunkManager::updateVisible(const Vector3&position) {
     }
 }
 
-void ChunkManager::updateRenderList(const Camera& camera) {
+void ChunkManager::updateRenderList(const Camera&camera) {
     Matrix4 projection = camera.getProjectionMatrix();
     Matrix4 view = camera.getViewMatrix();
     frustum = Frustum(view * projection);
@@ -307,7 +309,7 @@ void ChunkManager::updateRenderList(const Camera& camera) {
         if (chunk->isLoaded && chunk->isSetup) {
             if (chunk->shouldRender) {
                 float offset = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
-                Vector3 chunkCenter = Chunk::chunkToVoxelPosition(chunk->position) + Vector3(offset, offset, offset);
+                Vector3 chunkCenter = Chunk::chunkToWorldPosition(chunk->position) + Vector3(offset, offset, offset);
                 float size = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
                 if (frustum.cubeInFrustum(chunkCenter, size, size, size) != Frustum::FRUSTUM_OUTSIDE) {
                     renderList.insert(chunk);
@@ -317,7 +319,7 @@ void ChunkManager::updateRenderList(const Camera& camera) {
     }
 }
 
-void ChunkManager::updateLists(const Camera& camera, bool doTickUpdates) {
+void ChunkManager::updateLists(const Camera&camera, bool doTickUpdates) {
     if (doTickUpdates) {
         updateLoadList();
         updateSetupList();
@@ -330,14 +332,14 @@ void ChunkManager::updateLists(const Camera& camera, bool doTickUpdates) {
     updateRenderList(camera);
 }
 
-void ChunkManager::update(const Camera& camera) {
+void ChunkManager::update(const Camera&camera) {
     updateLists(camera, true);
 
     _renderer->setViewMatrix(camera.getViewMatrix());
     _renderer->setProjectionMatrix(camera.getProjectionMatrix());
 }
 
-void ChunkManager::update(const Camera& camera, bool doListUpdates, bool doTickUpdates) {
+void ChunkManager::update(const Camera&camera, bool doListUpdates, bool doTickUpdates) {
     if (doListUpdates) {
         updateLists(camera, doTickUpdates);
 
@@ -359,6 +361,28 @@ void ChunkManager::render() {
     }
     //_meshRenderer->render();
     glutSwapBuffers();
+}
+
+void ChunkManager::breakBlock(const Camera&camera) {
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition() + camera.getUp(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 1000);
+    for (auto intersection: lookRay.getIntersections()) {
+        Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
+
+        if (Chunk* chunk = getChunk(chunkPosition); chunk != nullptr && chunk->isLoaded) {
+            if (const Vector3i blockLocalPos = Chunk::worldPositionToLocalBlockOffset(intersection);
+                chunk->blocks[blockLocalPos.x][blockLocalPos.y][blockLocalPos.z]->isActive()) {
+                chunk->breakBlock(blockLocalPos);
+                std::cout << "Broken block at: " << intersection.x << " " << intersection.y << " " << intersection.z <<
+                        std::endl;
+                std::cout << "In chunk: " << chunkPosition.x << " " << chunkPosition.y << " " << chunkPosition.z <<
+                        std::endl;
+                std::cout << "Locally: " << blockLocalPos.x << " " << blockLocalPos.y << " " << blockLocalPos.z <<
+                        std::endl;
+
+                break;
+            }
+        }
+    }
 }
 
 ChunkManager::~ChunkManager() {

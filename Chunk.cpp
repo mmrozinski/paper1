@@ -19,7 +19,7 @@ void Chunk::initialize() {
 void Chunk::generate(const FastNoiseLite& noise) {
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
-            Vector3 globalPosition = chunkToVoxelPosition(position);
+            Vector3 globalPosition = chunkToWorldPosition(position);
 
             float height = noise.GetNoise(globalPosition.x + x, globalPosition.z + z) * CHUNK_SIZE * 8;
 
@@ -88,17 +88,41 @@ void Chunk::updateFullSides() {
     }
 }
 
-Vector3i Chunk::voxelToChunkPosition(const Vector3& position) {
-    Vector3 vec = ((position) / CHUNK_SIZE / Block::BLOCK_RENDER_SIZE);
-    const int x = static_cast<int>(vec.x);
-    const int y = static_cast<int>(vec.y);
-    const int z = static_cast<int>(vec.z);
+Vector3i Chunk::worldToChunkPosition(const Vector3& position) {
+    Vector3 vec = (position / CHUNK_SIZE / Block::BLOCK_RENDER_SIZE);
+    const int x = static_cast<int>(position.x > 0 ? vec.x : vec.x - 1);
+    const int y = static_cast<int>(position.y > 0 ? vec.y : vec.y - 1);
+    const int z = static_cast<int>(position.z > 0 ? vec.z : vec.z - 1);
 
     return {x, y, z};
 }
 
-Vector3 Chunk::chunkToVoxelPosition(Vector3i position) {
+Vector3 Chunk::chunkToWorldPosition(const Vector3i& position) {
     return Vector3(static_cast<Vector3>(position) * CHUNK_SIZE * Block::BLOCK_RENDER_SIZE);
+}
+
+Vector3i Chunk::worldToBlockPosition(const Vector3& position) {
+    return {position / Block::BLOCK_RENDER_SIZE};
+}
+
+Vector3i Chunk::worldPositionToLocalBlockOffset(const Vector3& position) {
+    Vector3 result(
+        static_cast<int>(floorf(position.x / Block::BLOCK_RENDER_SIZE)) % CHUNK_SIZE,
+        static_cast<int>(floorf(position.y / Block::BLOCK_RENDER_SIZE)) % CHUNK_SIZE,
+        static_cast<int>(floorf(position.z / Block::BLOCK_RENDER_SIZE)) % CHUNK_SIZE
+    );
+
+    if (result.x < 0) {
+        result.x = 16 + result.x;
+    }
+    if (result.y < 0) {
+        result.y = 16 + result.y;
+    }
+    if (result.z < 0) {
+        result.z = 16 + result.z;
+    }
+
+    return result;
 }
 
 Chunk::Chunk(Vector3i position) {
@@ -178,6 +202,12 @@ void Chunk::render(ChunkRenderer* renderer) const {
     if (meshId != -1) {
         renderer->render(meshId);
     }
+}
+
+void Chunk::breakBlock(const Vector3i& position) {
+    blocks[position.x][position.y][position.z]->setActive(false);
+
+    needsRebuild = true;
 }
 
 Chunk::~Chunk() {

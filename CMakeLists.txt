@@ -31,6 +31,8 @@ add_executable(paper1 main.cpp
         BlockStone.h
         BlockGrass.h
         BlockWater.h
+        RayCaster.cpp
+        RayCaster.h
 )
 
 find_package(OpenGL REQUIRED)

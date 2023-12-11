@@ -1,6 +1,10 @@
 #ifndef PAPER1_VECTOR3_H
 #define PAPER1_VECTOR3_H
 
+#include "Vector3i.h"
+
+struct Vector3i;
+
 struct Vector3 {
 public:
     float x, y, z;
@@ -8,6 +12,8 @@ public:
     Vector3();
 
     Vector3(const Vector3& vector3);
+
+    Vector3(const Vector3i& vector3i);
 
     Vector3(float, float, float);
 

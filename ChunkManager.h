@@ -16,9 +16,11 @@
 class ChunkManager {
 private:
     const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 1024;
-    const int CHUNK_VISIBILITY_DISTANCE = 8;
+    const int CHUNK_VISIBILITY_DISTANCE = 4;
 
-    const int WORLD_SIZE = 16;
+    const int WORLD_SIZE = 1;
+
+    const float BREAK_RANGE = 5.0f;
     std::set<Chunk*> masterList = std::set<Chunk*>();
 
     std::set<Chunk*> loadList = std::set<Chunk*>();
@@ -56,6 +58,8 @@ public:
     void update(const Camera& camera);
     void update(const Camera& camera, bool doListUpdates, bool doTickUpdates);
     void render();
+
+    void breakBlock(const Camera& camera);
 
     ~ChunkManager();
 };

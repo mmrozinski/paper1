@@ -9,7 +9,7 @@
 
 class ChunkRenderer {
 private:
-    static constexpr int CHUNK_SIZE = 16;
+    static constexpr int CHUNK_SIZE = 16; // TODO: merge this with the one in Chunk.h
 
     std::vector<MeshRenderer*> _meshRenderers = std::vector<MeshRenderer*>();
     std::vector<int> _meshIds = std::vector<int>();

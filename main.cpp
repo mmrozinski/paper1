@@ -5,8 +5,6 @@
 
 #include "ChunkManager.h"
 
-// pls make this a class
-
 int win_height = 600;
 int win_width = 800;
 
@@ -32,50 +30,88 @@ void countFPS() {
         fps = frame * 1000.0 / (deltaTime - timebase);
         timebase = deltaTime;
         frame = 0;
-        std::cout << fps << std::endl;
-        std::cout << camera.getFront().x << camera.getFront().y << camera.getFront().z << std::endl;
-        std::cout << camera.getPitch() << camera.getYaw() << std::endl;
+        std::cout << "FPS: " << fps << std::endl;
+        std::cout << "Camera facing: " << camera.getFront().x << " " << camera.getFront().y << " " << camera.getFront().z << std::endl;
+        std::cout << "Position: " << camera.getPosition().x << " " << camera.getPosition().y << " " << camera.getPosition().z << std::endl;
+        std::cout << "Chunk position: " << Chunk::worldToChunkPosition(camera.getPosition()).x << " " << Chunk::worldToChunkPosition(camera.getPosition()).y << " " << Chunk::worldToChunkPosition(camera.getPosition()).z << std::endl;
+
+        std::cout << std::endl << std::endl;
     }
 }
 
-HHOOK keyboardHook;
+HHOOK keyboardHook, mouseHook;
+
+Vector3 movementVector(0, 0, 0);
 
 LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    if (nCode >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)) {
-        keyboardTime = glutGet(GLUT_ELAPSED_TIME);
-
+    keyboardTime = glutGet(GLUT_ELAPSED_TIME);
+    if (nCode >= 0 && wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
         auto* pKeyStruct = (KBDLLHOOKSTRUCT*)lParam;
         if (pKeyStruct->vkCode == VK_ESCAPE) {
             glutLeaveMainLoop();
         }
 
         if (pKeyStruct->vkCode == 'W') {
-            camera.setPosition(camera.getPosition() + camera.getFront() * speed * ((keyboardTime - keyboardTimebase)));
+            movementVector.z = 1.0;
         }
         if (pKeyStruct->vkCode == 'S') {
-            camera.setPosition(camera.getPosition() - camera.getFront() * speed * ((keyboardTime - keyboardTimebase)));
+            movementVector.z = -1.0;
         }
         if (pKeyStruct->vkCode == 'A') {
-            camera.setPosition(camera.getPosition() - camera.getRight() * speed * ((keyboardTime - keyboardTimebase)));
+            movementVector.x = -1.0;
         }
         if (pKeyStruct->vkCode == 'D') {
-            camera.setPosition(camera.getPosition() + camera.getRight() * speed * ((keyboardTime - keyboardTimebase)));
+            movementVector.x = 1.0;
         }
         if (pKeyStruct->vkCode == VK_SPACE) {
-            camera.setPosition(camera.getPosition() + camera.getUp() * speed * ((keyboardTime - keyboardTimebase)));
+            movementVector.y = 1.0;
         }
         if (pKeyStruct->vkCode == VK_LSHIFT) {
-            camera.setPosition(camera.getPosition() - camera.getUp() * speed * ((keyboardTime - keyboardTimebase)));
+            movementVector.y = -1.0;
         }
 
         if (pKeyStruct->vkCode == 'P') {
             doListUpdates = !doListUpdates;
+        }
+
+        if (pKeyStruct->vkCode == 'R') {
+            chunkManager->breakBlock(camera);
+        }
+    }
+    if (nCode >= 0 && wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
+        auto* pKeyStruct = (KBDLLHOOKSTRUCT*)lParam;
+
+        if (pKeyStruct->vkCode == 'W') {
+            movementVector.z = 0.0;
+        }
+        if (pKeyStruct->vkCode == 'S') {
+            movementVector.z = 0.0;
+        }
+        if (pKeyStruct->vkCode == 'A') {
+            movementVector.x = 0.0;
+        }
+        if (pKeyStruct->vkCode == 'D') {
+            movementVector.x = 0.0;
+        }
+        if (pKeyStruct->vkCode == VK_SPACE) {
+            movementVector.y = 0.0;
+        }
+        if (pKeyStruct->vkCode == VK_LSHIFT) {
+            movementVector.y = 0.0;
         }
     }
     keyboardTimebase = keyboardTime;
     return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
 }
 
+LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode >= 0) {
+        if (wParam == WM_LBUTTONDOWN) {
+            //chunkManager->breakBlock(camera);
+        }
+    }
+    return CallNextHookEx(mouseHook, nCode, wParam, lParam);
+}
 
 void handleDisplay() {
     frame++;
@@ -102,8 +138,17 @@ void handleUpdateTick(int) {
 }
 
 void handleUpdateSubTick(int) {
+    keyboardTime = glutGet(GLUT_ELAPSED_TIME);
+
     chunkManager->update(camera, doListUpdates, false);
 
+    camera.setPosition(
+        camera.getPosition() + movementVector.x * camera.getRight() * speed * (keyboardTime - keyboardTimebase) +
+        movementVector.y * camera.getUp() * speed * (keyboardTime - keyboardTimebase) +
+        movementVector.z * camera.getFront() * speed * (keyboardTime - keyboardTimebase)
+        );
+
+    keyboardTimebase = keyboardTime;
     glutTimerFunc(1, handleUpdateSubTick, 0);
 }
 
@@ -152,6 +197,7 @@ void initGLUT(int *argc, char **argv) {
     glutTimerFunc(1, handleUpdateSubTick, 0);
 
     keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, nullptr, 0);
+    //mouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseProc, nullptr, 0);
 
     while(ShowCursor(false) >= 0);
 }
