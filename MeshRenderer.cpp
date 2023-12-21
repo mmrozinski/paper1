@@ -80,7 +80,7 @@ void MeshRenderer::render() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT, GL_FILL);
 
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);

@@ -364,7 +364,7 @@ void ChunkManager::render() {
 }
 
 void ChunkManager::breakBlock(const Camera&camera) {
-    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition() + camera.getUp(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 1000);
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition() + camera.getUp(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 100);
     for (auto intersection: lookRay.getIntersections()) {
         Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
 

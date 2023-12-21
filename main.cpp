@@ -5,8 +5,8 @@
 
 #include "ChunkManager.h"
 
-int win_height = 600;
-int win_width = 800;
+int win_height = 720;
+int win_width = 1024;
 
 int tickDelay = 100;
 

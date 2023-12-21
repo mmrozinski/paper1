@@ -39,8 +39,6 @@ in vec3 Normal;
 in vec3 FragPos;
 in vec3 ObjectColor;
 
-float borderThickness = 0.1;
-
 vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 
 vec3 lightPos = vec3(100.0f, 100.0f, 100.0f);
