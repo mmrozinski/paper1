@@ -6,6 +6,7 @@
 #include "Block.h"
 #include "MeshRenderer.h"
 #include "Vector3i.h"
+#include "TextureManager.h"
 
 class ChunkRenderer {
 private:
@@ -18,6 +19,7 @@ private:
     Matrix4 _projection;
 
     Shader *_shader;
+    TextureManager *_textureManager;
 
     static void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, Vector3 color, MeshRenderer* renderer);
 

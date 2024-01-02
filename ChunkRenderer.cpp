@@ -24,13 +24,18 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     unsigned int v7;
     unsigned int v8;
 
+    Vector3 topLeft(0.0f, 1.0f, 0.0f);
+    Vector3 topRight(1.0f, 1.0f, 0.0f);
+    Vector3 bottomLeft(0.0f, 0.0f, 0.0f);
+    Vector3 bottomRight(1.0f, 0.0f, 0.0f);
+
     // Front
     n = Vector3::unitZ();
     if (zPositive) {
-        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color));
-        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color));
-        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color));
-        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color));
+        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color, topLeft));
+        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color, topRight));
+        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color, bottomLeft));
+        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color, bottomRight));
         renderer->addTriangleToMesh(v1, v2, v3);
         renderer->addTriangleToMesh(v1, v3, v4);
     }
@@ -38,10 +43,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Back
     n = -Vector3::unitZ();
     if (zNegative) {
-        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color));
-        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color));
-        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color));
-        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color));
+        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color, topLeft));
+        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color, topRight));
+        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color, bottomLeft));
+        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color, bottomRight));
         renderer->addTriangleToMesh(v5, v6, v7);
         renderer->addTriangleToMesh(v5, v7, v8);
     }
@@ -49,10 +54,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Right
     n = Vector3::unitX();
     if (xPositive) {
-        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color));
-        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color));
-        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color));
-        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color));
+        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color, topLeft));
+        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color, topRight));
+        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color, bottomLeft));
+        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color, bottomRight));
         renderer->addTriangleToMesh(v2, v5, v8);
         renderer->addTriangleToMesh(v2, v8, v3);
     }
@@ -60,10 +65,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Left
     n = -Vector3::unitX();
     if (xNegative) {
-        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color));
-        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color));
-        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color));
-        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color));
+        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color, topLeft));
+        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color, topRight));
+        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color, bottomLeft));
+        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color, bottomRight));
         renderer->addTriangleToMesh(v6, v1, v4);
         renderer->addTriangleToMesh(v6, v4, v7);
     }
@@ -71,10 +76,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Top
     n = Vector3::unitY();
     if (yPositive) {
-        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color));
-        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color));
-        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color));
-        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color));
+        v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color, topLeft));
+        v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color, topRight));
+        v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color, bottomLeft));
+        v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color, bottomRight));
         renderer->addTriangleToMesh(v4, v3, v8);
         renderer->addTriangleToMesh(v4, v8, v7);
     }
@@ -82,10 +87,10 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     // Bottom
     n = -Vector3::unitY();
     if (yNegative) {
-        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color));
-        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color));
-        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color));
-        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color));
+        v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color, topLeft));
+        v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color, topRight));
+        v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color, bottomLeft));
+        v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color, bottomRight));
         renderer->addTriangleToMesh(v6, v5, v2);
         renderer->addTriangleToMesh(v6, v2, v1);
     }
@@ -93,6 +98,7 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
 
 ChunkRenderer::ChunkRenderer() {
     _shader = new Shader("shader.vert", "shader.frag");
+    _textureManager = TextureManager::getInstance();
 
     _shader->use();
 }

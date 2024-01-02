@@ -33,7 +33,16 @@ add_executable(paper1 main.cpp
         BlockWater.h
         RayCaster.cpp
         RayCaster.h
+        TextureManager.cpp
+        TextureManager.h
 )
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/textures.jpg
+        ${CMAKE_CURRENT_BINARY_DIR}/textures.jpg
+        COPYONLY)
+
+include_directories(${CMAKE_SOURCE_DIR}/../extern/stb_image)
+link_directories(${CMAKE_SOURCE_DIR}/../extern/stb_image)
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)

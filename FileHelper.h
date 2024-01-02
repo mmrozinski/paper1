@@ -12,6 +12,7 @@ public:
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec3 aColor;
+layout (location = 2) in vec3 aTextureCoordinate;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -20,6 +21,7 @@ uniform mat4 projection;
 out vec3 Normal;
 out vec3 FragPos;
 out vec3 ObjectColor;
+out vec2 TextureCoordinate;
 
 void main()
 {
@@ -27,6 +29,7 @@ void main()
     FragPos = vec3(model * vec4(aPosition, 1.0));
     Normal = aNormal;
     ObjectColor = aColor;
+    TextureCoordinate = aTextureCoordinate;
 }
 )";
         } else if (path == "shader.frag") {
@@ -38,6 +41,9 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 FragPos;
 in vec3 ObjectColor;
+in vec2 TextureCoordinate;
+
+uniform sampler2D blockTexture;
 
 vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
 
@@ -56,7 +62,9 @@ void main()
     float ambientStrength = 0.3;
     vec3 ambient = ambientStrength * lightColor;
 
-    vec3 result = (ambient + diffuse) * ObjectColor;
+    vec3 textureColor = texture(blockTexture, TextureCoordinate);
+
+    vec3 result = (ambient + diffuse) * ObjectColor * textureColor;
     FragColor = vec4(result, 1.0);
 }
 )";

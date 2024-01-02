@@ -1,6 +1,10 @@
+#define STB_IMAGE_IMPLEMENTATION
+
+#include "extern/stb_image.h"
 #include <Windows.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+
 #include <iostream>
 
 #include "ChunkManager.h"
@@ -200,6 +204,14 @@ void initGLUT(int *argc, char **argv) {
     //mouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseProc, nullptr, 0);
 
     while(ShowCursor(false) >= 0);
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("textures.jpg", &width, &height, &nrChannels, 0);
+
+    TextureManager* textureManager = TextureManager::getInstance();
+    textureManager->setTextureImage(data, width, height, nrChannels);
+
+    stbi_image_free(data);
 }
 
 int main(int argc, char **argv) {

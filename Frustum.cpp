@@ -113,14 +113,14 @@ void Frustum::preRender(MeshRenderer* renderer) {
     Vector3 p7 = intersectionPoint(planes[1], planes[2], planes[5]);
     Vector3 p8 = intersectionPoint(planes[1], planes[3], planes[5]);
 
-    auto v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, Vector3(0, 0, 0), Vector3(1, 1, 1)));
+    auto v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    auto v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    auto v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    auto v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    auto v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    auto v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    auto v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    auto v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
 
     //front
     renderer->addTriangleToMesh(v1, v2, v3);
