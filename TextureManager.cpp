@@ -2,10 +2,6 @@
 
 TextureManager* TextureManager::instance = nullptr;
 
-TextureManager::TextureManager() {
-
-}
-
 TextureManager *TextureManager::getInstance() {
     if (instance == nullptr) {
         instance = new TextureManager();

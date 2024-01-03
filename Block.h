@@ -18,6 +18,8 @@ public:
     void setActive(const bool active) {
         this->active = active;
     }
+
+    [[nodiscard]] virtual Block* clone() const = 0;
 };
 
 

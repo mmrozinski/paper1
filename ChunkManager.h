@@ -16,7 +16,7 @@
 class ChunkManager {
 private:
     const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 1024;
-    const int CHUNK_VISIBILITY_DISTANCE = 4;
+    const int CHUNK_VISIBILITY_DISTANCE = 8;
 
     const int WORLD_SIZE = 1;
 
@@ -60,6 +60,7 @@ public:
     void render();
 
     void breakBlock(const Camera& camera);
+    void placeBlock(const Camera& camera);
 
     ~ChunkManager();
 };

@@ -54,6 +54,7 @@ public:
     void render(ChunkRenderer* renderer) const;
 
     void breakBlock(const Vector3i& position);
+    void setBlock(const Vector3i& position, const Block& block);
 
     ~Chunk();
 };

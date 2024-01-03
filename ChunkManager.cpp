@@ -1,5 +1,6 @@
 #include "ChunkManager.h"
 
+#include "BlockStone.h"
 #include "RayCaster.h"
 
 Chunk* ChunkManager::getChunk(const Vector3i&position) const {
@@ -365,7 +366,7 @@ void ChunkManager::render() {
 }
 
 void ChunkManager::breakBlock(const Camera&camera) {
-    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition() + camera.getUp(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 100);
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 100);
     for (auto intersection: lookRay.getIntersections()) {
         Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
 
@@ -381,6 +382,41 @@ void ChunkManager::breakBlock(const Camera&camera) {
                         std::endl;
 
                 break;
+            }
+        }
+    }
+}
+
+void ChunkManager::placeBlock(const Camera& camera) {
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 100);
+    auto intersections = lookRay.getIntersections();
+    for (int i = 0; i < intersections.size(); i++) {
+        auto intersection = intersections[i];
+        Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
+
+        if (Chunk* chunk = getChunk(chunkPosition); chunk != nullptr && chunk->isLoaded) {
+            if (const Vector3i blockLocalPos = Chunk::worldPositionToLocalBlockOffset(intersection);
+                chunk->blocks[blockLocalPos.x][blockLocalPos.y][blockLocalPos.z]->isActive()) {
+                if (i == 0) {
+                    break;
+                }
+                intersection = intersections[i - 1];
+
+                Vector3i placeChunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
+
+                if (Chunk* placeChunk = getChunk(placeChunkPosition); placeChunk != nullptr && placeChunk->isLoaded) {
+                    BlockStone placedBlock;
+                    placedBlock.setActive(true);
+                    placeChunk->setBlock(Chunk::worldPositionToLocalBlockOffset(intersection), placedBlock);
+                    std::cout << "Placed block at: " << intersection.x << " " << intersection.y << " " << intersection.z <<
+                            std::endl;
+                    std::cout << "In chunk: " << placeChunkPosition.x << " " << placeChunkPosition.y << " " << placeChunkPosition.z <<
+                            std::endl;
+                    std::cout << "Locally: " << blockLocalPos.x << " " << blockLocalPos.y << " " << blockLocalPos.z <<
+                            std::endl;
+
+                    break;
+                }
             }
         }
     }

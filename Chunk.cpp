@@ -210,6 +210,13 @@ void Chunk::breakBlock(const Vector3i& position) {
     needsRebuild = true;
 }
 
+void Chunk::setBlock(const Vector3i& position, const Block& block) {
+    delete blocks[position.x][position.y][position.z];
+    blocks[position.x][position.y][position.z] = block.clone();
+
+    needsRebuild = true;
+}
+
 Chunk::~Chunk() {
     for (auto&block: blocks) {
         for (auto&y: block) {

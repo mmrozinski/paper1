@@ -7,7 +7,7 @@ class TextureManager {
 private:
     static TextureManager* instance;
 
-    TextureManager();
+    TextureManager() = default;
 
     unsigned int texture;
 public:
