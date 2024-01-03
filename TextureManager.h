@@ -13,6 +13,7 @@ private:
 public:
     static TextureManager* getInstance();
     void setTextureImage(unsigned char* data, int width, int height, int nrChannels);
+    void bindTexture() const;
     ~TextureManager();
 };
 

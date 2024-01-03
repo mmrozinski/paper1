@@ -12,7 +12,7 @@ public:
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec3 aColor;
-layout (location = 2) in vec3 aTextureCoordinate;
+layout (location = 3) in vec2 aTextureCoordinate;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -62,10 +62,11 @@ void main()
     float ambientStrength = 0.3;
     vec3 ambient = ambientStrength * lightColor;
 
-    vec3 textureColor = texture(blockTexture, TextureCoordinate);
+    vec4 textureColor = texture(blockTexture, TextureCoordinate);
 
-    vec3 result = (ambient + diffuse) * ObjectColor * textureColor;
-    FragColor = vec4(result, 1.0);
+    vec3 result = (ambient + diffuse) * ObjectColor;
+
+    FragColor = textureColor * vec4(result, 1.0);
 }
 )";
         }

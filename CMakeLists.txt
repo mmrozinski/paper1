@@ -37,8 +37,8 @@ add_executable(paper1 main.cpp
         TextureManager.h
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/textures.jpg
-        ${CMAKE_CURRENT_BINARY_DIR}/textures.jpg
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/textures.png
+        ${CMAKE_CURRENT_BINARY_DIR}/textures.png
         COPYONLY)
 
 include_directories(${CMAKE_SOURCE_DIR}/../extern/stb_image)

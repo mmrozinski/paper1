@@ -206,7 +206,7 @@ void initGLUT(int *argc, char **argv) {
     while(ShowCursor(false) >= 0);
 
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("textures.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("textures.png", &width, &height, &nrChannels, 0);
 
     TextureManager* textureManager = TextureManager::getInstance();
     textureManager->setTextureImage(data, width, height, nrChannels);

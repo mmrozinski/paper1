@@ -356,6 +356,7 @@ void ChunkManager::update(const Camera&camera, bool doListUpdates, bool doTickUp
 
 void ChunkManager::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     for (auto chunk: renderList) {
         chunk->render(_renderer);
     }
