@@ -12,7 +12,8 @@
 int win_height = 720;
 int win_width = 1024;
 
-int tickDelay = 100;
+int tickDelay = 50;
+int subTickDelay = 10;
 
 int frame = 0, deltaTime, timebase = 0;
 int keyboardTime, keyboardTimebase = 0;
@@ -157,7 +158,7 @@ void handleUpdateSubTick(int) {
         );
 
     keyboardTimebase = keyboardTime;
-    glutTimerFunc(1, handleUpdateSubTick, 0);
+    glutTimerFunc(subTickDelay, handleUpdateSubTick, 0);
 }
 
 void handleMouseMove(int x, int y) {
@@ -202,7 +203,7 @@ void initGLUT(int *argc, char **argv) {
     glutPassiveMotionFunc(handleMouseMove);
     glutTimerFunc(1000 / fps_cap, timer, 0);
     glutTimerFunc(tickDelay, handleUpdateTick, 0);
-    glutTimerFunc(1, handleUpdateSubTick, 0);
+    glutTimerFunc(subTickDelay, handleUpdateSubTick, 0);
 
     keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, nullptr, 0);
     //mouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseProc, nullptr, 0);
