@@ -4,7 +4,7 @@
 
 #include "Block.h"
 #include "ChunkRenderer.h"
-#include "FastNoiseLite.h"
+#include "extern/FastNoiseLite.h"
 #include "Vector3.h"
 #include "Vector3i.h"
 

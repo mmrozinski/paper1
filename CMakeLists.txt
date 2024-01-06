@@ -27,7 +27,7 @@ add_executable(paper1 main.cpp
         Plane.h
         Frustum.cpp
         Frustum.h
-        FastNoiseLite.h
+        extern/FastNoiseLite.h
         BlockStone.h
         BlockGrass.h
         BlockWater.h

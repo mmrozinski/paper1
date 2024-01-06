@@ -13,7 +13,7 @@ int win_height = 720;
 int win_width = 1024;
 
 int tickDelay = 50;
-int subTickDelay = 10;
+int subTickDelay = 1;
 
 int frame = 0, deltaTime, timebase = 0;
 int keyboardTime, keyboardTimebase = 0;
@@ -194,7 +194,7 @@ void initGLUT(int *argc, char **argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
     glutInitWindowSize(win_width, win_height);
-    glutCreateWindow("nice squares");
+    glutCreateWindow("cubes");
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 

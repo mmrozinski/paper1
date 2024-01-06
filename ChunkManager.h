@@ -10,7 +10,7 @@
 #include "Camera.h"
 #include "Chunk.h"
 #include "Frustum.h"
-#include "FastNoiseLite.h"
+#include "extern/FastNoiseLite.h"
 
 
 class ChunkManager {
