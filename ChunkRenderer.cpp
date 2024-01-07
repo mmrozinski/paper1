@@ -3,7 +3,7 @@
 #include <algorithm>
 
 void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative,
-                               bool zPositive, float x, float y, float z, Vector3 color, MeshRenderer* renderer) {
+                               bool zPositive, float x, float y, float z, Vector3 color, Vector3i texturePos, MeshRenderer* renderer) {
     Vector3 p1 = Vector3(x, y, z + Block::BLOCK_RENDER_SIZE);
     Vector3 p2 = Vector3(x + Block::BLOCK_RENDER_SIZE, y, z + Block::BLOCK_RENDER_SIZE);
     Vector3 p3 = Vector3(x + Block::BLOCK_RENDER_SIZE, y + Block::BLOCK_RENDER_SIZE, z + Block::BLOCK_RENDER_SIZE);
@@ -24,10 +24,12 @@ void ChunkRenderer::createCube(bool xNegative, bool xPositive, bool yNegative, b
     unsigned int v7;
     unsigned int v8;
 
-    Vector3 topLeft(0.0f, 1.0f, 0.0f);
-    Vector3 topRight(1.0f, 1.0f, 0.0f);
-    Vector3 bottomLeft(0.0f, 0.0f, 0.0f);
-    Vector3 bottomRight(1.0f, 0.0f, 0.0f);
+    Vector3 textureIndexScale(0.5f * texturePos.x, 0.5f * texturePos.y, 0.0f);
+
+    Vector3 topLeft = Vector3(0.0f, 0.5f, 0.0f) + textureIndexScale;
+    Vector3 topRight = Vector3(0.5f, 0.5f, 0.0f) + textureIndexScale;
+    Vector3 bottomLeft = Vector3(0.0f, 0.0f, 0.0f) + textureIndexScale;
+    Vector3 bottomRight = Vector3(0.5f, 0.0f, 0.0f) + textureIndexScale;
 
     // Front
     n = Vector3::unitZ();
@@ -159,7 +161,7 @@ int ChunkRenderer::addChunk(const Vector3i& position, Block* blocks[][CHUNK_SIZE
                 bool zPositive = true;
                 if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
 
-                createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), renderer);
+                createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), blocks[x][y][z]->getTexturePos(), renderer);
             }
         }
     }
@@ -215,7 +217,7 @@ MeshRenderer* ChunkRenderer::createChunkMeshToAdd(const Vector3i& position, Bloc
                 bool zPositive = true;
                 if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
 
-                createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), renderer);
+                createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), blocks[x][y][z]->getTexturePos(), renderer);
             }
         }
     }

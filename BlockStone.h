@@ -15,6 +15,10 @@ public:
         cloned->setActive(this->isActive());
         return cloned;
     }
+
+    Vector3i getTexturePos() const override {
+        return Vector3i(1, 0, 0);
+    }
 };
 
 

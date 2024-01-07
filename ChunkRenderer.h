@@ -21,7 +21,7 @@ private:
     Shader *_shader;
     TextureManager *_textureManager;
 
-    static void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, Vector3 color, MeshRenderer* renderer);
+    static void createCube(bool xNegative, bool xPositive, bool yNegative, bool yPositive, bool zNegative, bool zPositive, float x, float y, float z, Vector3 color, Vector3i texturePos, MeshRenderer* renderer);
 
 public:
     ChunkRenderer();

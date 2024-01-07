@@ -6,7 +6,7 @@
 
 class BlockWater: public Block {
     Vector3 getColor() const override {
-        return Vector3(0.1f, 0.2f, 0.6f);
+        return Vector3(0.1f, 0.2f, 0.7f);
     }
 
 public:
@@ -14,6 +14,10 @@ public:
         Block* cloned = new BlockWater();
         cloned->setActive(this->isActive());
         return cloned;
+    }
+
+    Vector3i getTexturePos() const override {
+        return Vector3i(0, 1, 0);
     }
 };
 
