@@ -15,12 +15,7 @@
 
 class ChunkManager {
 private:
-    const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 1024;
-    const int CHUNK_VISIBILITY_DISTANCE = 7;
 
-    const int WORLD_SIZE = 1;
-
-    const float BREAK_RANGE = 5.0f;
     std::set<Chunk*> masterList = std::set<Chunk*>();
 
     std::set<Chunk*> loadList = std::set<Chunk*>();

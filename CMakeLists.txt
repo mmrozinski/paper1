@@ -35,6 +35,7 @@ add_executable(paper1 main.cpp
         RayCaster.h
         TextureManager.cpp
         TextureManager.h
+        ConfigHelper.h
 )
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/textures.png

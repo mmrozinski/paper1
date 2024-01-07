@@ -128,17 +128,17 @@ bool ChunkRenderer::isEmpty(int meshId) {
     return true;
 }
 
-int ChunkRenderer::addChunk(const Vector3i& position, Block* blocks[][CHUNK_SIZE][CHUNK_SIZE]) { // make a version of this that just makes a new MeshRenderer to parllelize
+int ChunkRenderer::addChunk(const Vector3i& position, Block* blocks[][ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE]) { // make a version of this that just makes a new MeshRenderer to parllelize
     auto* renderer = new MeshRenderer(_shader);
     renderer->setViewMatrix(_view);
     renderer->setProjectionMatrix(_projection);
     renderer->setModelMatrix(
         Matrix4::createTranslation(
-            static_cast<Vector3>(position) * CHUNK_SIZE * Block::BLOCK_RENDER_SIZE));
+            static_cast<Vector3>(position) * ConfigHelper::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE));
 
-    for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int y = 0; y < CHUNK_SIZE; y++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
+    for (int x = 0; x < ConfigHelper::CHUNK_SIZE; x++) {
+        for (int y = 0; y < ConfigHelper::CHUNK_SIZE; y++) {
+            for (int z = 0; z < ConfigHelper::CHUNK_SIZE; z++) {
                 if (!blocks[x][y][z]->isActive()) {
                     continue;
                 }
@@ -147,19 +147,19 @@ int ChunkRenderer::addChunk(const Vector3i& position, Block* blocks[][CHUNK_SIZE
                 if (x > 0) xNegative = !blocks[x - 1][y][z]->isActive();
 
                 bool xPositive = true;
-                if (x < CHUNK_SIZE - 1) xPositive = !blocks[x + 1][y][z]->isActive();
+                if (x < ConfigHelper::CHUNK_SIZE - 1) xPositive = !blocks[x + 1][y][z]->isActive();
 
                 bool yNegative = true;
                 if (y > 0) yNegative = !blocks[x][y - 1][z]->isActive();
 
                 bool yPositive = true;
-                if (y < CHUNK_SIZE - 1) yPositive = !blocks[x][y + 1][z]->isActive();
+                if (y < ConfigHelper::CHUNK_SIZE - 1) yPositive = !blocks[x][y + 1][z]->isActive();
 
                 bool zNegative = true;
                 if (z > 0) zNegative = !blocks[x][y][z - 1]->isActive();
 
                 bool zPositive = true;
-                if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
+                if (z < ConfigHelper::CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
 
                 createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), blocks[x][y][z]->getTexturePos(), renderer);
             }
@@ -184,17 +184,17 @@ int ChunkRenderer::addChunk(MeshRenderer* renderer) {
     return max;
 }
 
-MeshRenderer* ChunkRenderer::createChunkMeshToAdd(const Vector3i& position, Block* blocks[][CHUNK_SIZE][CHUNK_SIZE]) const {
+MeshRenderer* ChunkRenderer::createChunkMeshToAdd(const Vector3i& position, Block* blocks[][ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE]) const {
     auto* renderer = new MeshRenderer(_shader);
     renderer->setViewMatrix(_view);
     renderer->setProjectionMatrix(_projection);
     renderer->setModelMatrix(
         Matrix4::createTranslation(
-            static_cast<Vector3>(position) * CHUNK_SIZE * Block::BLOCK_RENDER_SIZE));
+            static_cast<Vector3>(position) * ConfigHelper::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE));
 
-    for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int y = 0; y < CHUNK_SIZE; y++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
+    for (int x = 0; x < ConfigHelper::CHUNK_SIZE; x++) {
+        for (int y = 0; y < ConfigHelper::CHUNK_SIZE; y++) {
+            for (int z = 0; z < ConfigHelper::CHUNK_SIZE; z++) {
                 if (!blocks[x][y][z]->isActive()) {
                     continue;
                 }
@@ -203,19 +203,19 @@ MeshRenderer* ChunkRenderer::createChunkMeshToAdd(const Vector3i& position, Bloc
                 if (x > 0) xNegative = !blocks[x - 1][y][z]->isActive();
 
                 bool xPositive = true;
-                if (x < CHUNK_SIZE - 1) xPositive = !blocks[x + 1][y][z]->isActive();
+                if (x < ConfigHelper::CHUNK_SIZE - 1) xPositive = !blocks[x + 1][y][z]->isActive();
 
                 bool yNegative = true;
                 if (y > 0) yNegative = !blocks[x][y - 1][z]->isActive();
 
                 bool yPositive = true;
-                if (y < CHUNK_SIZE - 1) yPositive = !blocks[x][y + 1][z]->isActive();
+                if (y < ConfigHelper::CHUNK_SIZE - 1) yPositive = !blocks[x][y + 1][z]->isActive();
 
                 bool zNegative = true;
                 if (z > 0) zNegative = !blocks[x][y][z - 1]->isActive();
 
                 bool zPositive = true;
-                if (z < CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
+                if (z < ConfigHelper::CHUNK_SIZE - 1) zPositive = !blocks[x][y][z + 1]->isActive();
 
                 createCube(xNegative, xPositive, yNegative, yPositive, zNegative, zPositive, x, y, z, blocks[x][y][z]->getColor(), blocks[x][y][z]->getTexturePos(), renderer);
             }

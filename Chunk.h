@@ -21,12 +21,10 @@ private:
     void updateFullSides();
 
 public:
-    static constexpr int CHUNK_SIZE = 16; // TODO: merge this with the one in ChunkRenderer.h
-
     enum Sides { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
     static constexpr Sides allSides[] = { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
 
-    Block* blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
+    Block* blocks[ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE]{};
 
     Vector3i position;
 
