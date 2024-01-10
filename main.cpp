@@ -86,6 +86,10 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
         if (pKeyStruct->vkCode == 'E') {
             chunkManager->placeBlock(camera);
         }
+
+        if (pKeyStruct->vkCode == 'Q') {
+            chunkManager->pickBlock(camera);
+        }
     }
     if (nCode >= 0 && wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
         auto* pKeyStruct = (KBDLLHOOKSTRUCT*)lParam;

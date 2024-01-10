@@ -15,6 +15,7 @@
 
 class ChunkManager {
 private:
+    Block* selectedBlock;
 
     std::set<Chunk*> masterList = std::set<Chunk*>();
 
@@ -56,6 +57,7 @@ public:
 
     void breakBlock(const Camera& camera);
     void placeBlock(const Camera& camera);
+    void pickBlock(const Camera& camera);
 
     ~ChunkManager();
 };

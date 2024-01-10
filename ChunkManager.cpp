@@ -136,6 +136,8 @@ void ChunkManager::optimizeForNeighbour(Chunk* chunk) const {
 ChunkManager::ChunkManager() {
     _renderer = new ChunkRenderer();
     _meshRenderer = new MeshRenderer();
+    selectedBlock = new BlockStone();
+    selectedBlock->setActive(true);
 
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     noise.SetFractalType(FastNoiseLite::FractalType_FBm);
@@ -405,9 +407,7 @@ void ChunkManager::placeBlock(const Camera& camera) {
                 Vector3i placeChunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
 
                 if (Chunk* placeChunk = getChunk(placeChunkPosition); placeChunk != nullptr && placeChunk->isLoaded) {
-                    BlockStone placedBlock;
-                    placedBlock.setActive(true);
-                    placeChunk->setBlock(Chunk::worldPositionToLocalBlockOffset(intersection), placedBlock);
+                    placeChunk->setBlock(Chunk::worldPositionToLocalBlockOffset(intersection), *selectedBlock);
                     std::cout << "Placed block at: " << intersection.x << " " << intersection.y << " " << intersection.z <<
                             std::endl;
                     std::cout << "In chunk: " << placeChunkPosition.x << " " << placeChunkPosition.y << " " << placeChunkPosition.z <<
@@ -422,10 +422,31 @@ void ChunkManager::placeBlock(const Camera& camera) {
     }
 }
 
+void ChunkManager::pickBlock(const Camera& camera) {
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition(), camera.getPosition() + (camera.getFront() * ConfigHelper::BREAK_RANGE), 100);
+    for (auto intersection: lookRay.getIntersections()) {
+        Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
+
+        if (Chunk* chunk = getChunk(chunkPosition); chunk != nullptr && chunk->isLoaded) {
+            if (const Vector3i blockLocalPos = Chunk::worldPositionToLocalBlockOffset(intersection);
+                chunk->blocks[blockLocalPos.x][blockLocalPos.y][blockLocalPos.z]->isActive()) {
+                delete selectedBlock;
+                selectedBlock = chunk->blocks[blockLocalPos.x][blockLocalPos.y][blockLocalPos.z]->clone();
+
+                break;
+            }
+        }
+    }
+}
+
 ChunkManager::~ChunkManager() {
     for (auto chunk: masterList) {
         delete chunk;
     }
     delete _renderer;
     delete _meshRenderer;
+
+    if (selectedBlock != nullptr) {
+        delete selectedBlock;
+    }
 }
