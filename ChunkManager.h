@@ -9,12 +9,18 @@
 
 #include "Camera.h"
 #include "Chunk.h"
+#include "ConfigLoader.h"
 #include "Frustum.h"
 #include "extern/FastNoiseLite.h"
 
 
 class ChunkManager {
 private:
+    int CHUNK_VISIBILITY_DISTANCE;
+    float BREAK_RANGE;
+
+    ConfigLoader* configLoader;
+
     Block* selectedBlock;
 
     std::set<Chunk*> masterList = std::set<Chunk*>();
