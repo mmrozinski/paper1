@@ -39,10 +39,6 @@ void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3&position) {
         unloadList.insert(chunk);
     }
 
-    if (chunk->isLoaded && chunk->isSetup && !chunk->shouldRender) {
-        flagsUpdateList.insert(chunk);
-    }
-
     visibleList.insert(chunk);
 }
 
@@ -143,9 +139,21 @@ ChunkManager::ChunkManager() {
     CHUNK_VISIBILITY_DISTANCE = configLoader->getParameterInt("CHUNK_VISIBILITY_DISTANCE");
     BREAK_RANGE = configLoader->getParameterFloat("BREAK_RANGE");
 
-    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    if (const int noiseType = configLoader->getParameterInt("NOISE_TYPE");
+        noiseType == 2) {
+        noise.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
+    } else {
+        noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    }
+
     noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-    noise.SetSeed(static_cast<int>(time(nullptr)));
+
+    if (const int noiseSeed = configLoader->getParameterInt("NOISE_SEED");
+        noiseSeed == 0) {
+        noise.SetSeed(static_cast<int>(time(nullptr)));
+    } else {
+        noise.SetSeed(noiseSeed);
+    }
 }
 
 void ChunkManager::updateLoadList() {

@@ -1,2 +1,16 @@
+# ---- PARAMETRY DZIAŁANIA PROGRAMU ----
+# Odległość, z jakiej możliwe jest dodawanie / usuwanie / wybieranie bloków
 BREAK_RANGE = 5.0
-CHUNK_VISIBILITY_DISTANCE = 3
+
+# Dystans od kamery, w jakim chunki są uznawane za załadowane
+CHUNK_VISIBILITY_DISTANCE = 4
+
+# ---- PARAMETRY GENERACJI ŚWIATA ----
+
+# Typ szumu używany przy tworzeniu świata
+# 1 = szum Perlina, 2 = szum Value Cubic
+NOISE_TYPE = 1
+
+# Ziarno używane przy generowaniu szumu
+# 0 = losowa wartość
+NOISE_SEED = 0

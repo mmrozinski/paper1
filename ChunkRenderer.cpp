@@ -128,7 +128,7 @@ bool ChunkRenderer::isEmpty(int meshId) {
     return true;
 }
 
-int ChunkRenderer::addChunk(const Vector3i& position, Block* blocks[][ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE]) { // make a version of this that just makes a new MeshRenderer to parllelize
+int ChunkRenderer::addChunk(const Vector3i& position, Block* blocks[][ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE]) {
     auto* renderer = new MeshRenderer(_shader);
     renderer->setViewMatrix(_view);
     renderer->setProjectionMatrix(_projection);
