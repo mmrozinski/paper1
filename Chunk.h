@@ -4,7 +4,7 @@
 
 #include "Block.h"
 #include "ChunkRenderer.h"
-#include "FastNoiseLite.h"
+#include "extern/FastNoiseLite.h"
 #include "Vector3.h"
 #include "Vector3i.h"
 
@@ -21,12 +21,10 @@ private:
     void updateFullSides();
 
 public:
-    static constexpr int CHUNK_SIZE = 16; // TODO: merge this with the one in ChunkRenderer.h
-
     enum Sides { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
     static constexpr Sides allSides[] = { NORTH, SOUTH, WEST, EAST, TOP, BOTTOM };
 
-    Block* blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]{};
+    Block* blocks[ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE][ConfigHelper::CHUNK_SIZE]{};
 
     Vector3i position;
 
@@ -54,6 +52,7 @@ public:
     void render(ChunkRenderer* renderer) const;
 
     void breakBlock(const Vector3i& position);
+    void setBlock(const Vector3i& position, const Block& block);
 
     ~Chunk();
 };

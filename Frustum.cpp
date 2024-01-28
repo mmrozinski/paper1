@@ -113,38 +113,86 @@ void Frustum::preRender(MeshRenderer* renderer) {
     Vector3 p7 = intersectionPoint(planes[1], planes[2], planes[5]);
     Vector3 p8 = intersectionPoint(planes[1], planes[3], planes[5]);
 
-    auto v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, Vector3(0, 0, 0), Vector3(1, 1, 1)));
-    auto v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, Vector3(0, 0, 0), Vector3(1, 1, 1)));
+    // auto v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    // auto v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(1.0f, 0.0f, 0.0f)));
+    // auto v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(1.0f, 1.0f, 0.0f)));
+    // auto v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 1.0f, 0.0f)));
+    // auto v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(1.0f, 1.0f, 0.0f)));
+    // auto v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 1.0f, 0.0f)));
+    // auto v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(0.0f, 0.0f, 0.0f)));
+    // auto v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, Vector3(0, 0, 0), Vector3(1, 1, 1), Vector3(1.0f, 0.0f, 0.0f)));
 
-    //front
+    Vector3 n;
+
+    unsigned int v1;
+    unsigned int v2;
+    unsigned int v3;
+    unsigned int v4;
+    unsigned int v5;
+    unsigned int v6;
+    unsigned int v7;
+    unsigned int v8;
+
+    Vector3 color(1.0f, 0.0f, 0.0f);
+
+    Vector3 topLeft(0.0f, 1.0f, 0.0f);
+    Vector3 topRight(1.0f, 1.0f, 0.0f);
+    Vector3 bottomLeft(0.0f, 0.0f, 0.0f);
+    Vector3 bottomRight(1.0f, 0.0f, 0.0f);
+
+    // Front
+    n = planes[4].getNormal();
+    v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color, bottomLeft));
+    v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color, bottomRight));
+    v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color, topRight));
+    v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color, topLeft));
     renderer->addTriangleToMesh(v1, v2, v3);
     renderer->addTriangleToMesh(v1, v3, v4);
 
-    //top
-    renderer->addTriangleToMesh(v5, v2, v1);
-    renderer->addTriangleToMesh(v5, v6, v2);
+    // Back
+    n = planes[5].getNormal();
+    v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color, bottomLeft));
+    v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color, bottomRight));
+    v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color, topRight));
+    v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color, topLeft));
+    renderer->addTriangleToMesh(v5, v6, v7);
+    renderer->addTriangleToMesh(v5, v7, v8);
 
-    //right
-    renderer->addTriangleToMesh(v2, v6, v3);
-    renderer->addTriangleToMesh(v6, v7, v3);
+    // Right
+    n = planes[3].getNormal();
+    v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color, bottomLeft));
+    v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color, bottomRight));
+    v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color, topRight));
+    v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color, topLeft));
+    renderer->addTriangleToMesh(v2, v5, v8);
+    renderer->addTriangleToMesh(v2, v8, v3);
 
-    //back
-    renderer->addTriangleToMesh(v5, v6, v8);
-    renderer->addTriangleToMesh(v6, v7, v8);
+    // Left
+    n = planes[2].getNormal();
+    v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color, bottomLeft));
+    v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color, bottomRight));
+    v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color, topRight));
+    v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color, topLeft));
+    renderer->addTriangleToMesh(v6, v1, v4);
+    renderer->addTriangleToMesh(v6, v4, v7);
 
-    //bottom
-    renderer->addTriangleToMesh(v8, v7, v4);
-    renderer->addTriangleToMesh(v7, v3, v4);
+    // Top
+    n = planes[1].getNormal();
+    v4 = static_cast<unsigned int>(renderer->addVertexToMesh(p4, n, color, bottomLeft));
+    v3 = static_cast<unsigned int>(renderer->addVertexToMesh(p3, n, color, bottomRight));
+    v8 = static_cast<unsigned int>(renderer->addVertexToMesh(p8, n, color, topRight));
+    v7 = static_cast<unsigned int>(renderer->addVertexToMesh(p7, n, color, topLeft));
+    renderer->addTriangleToMesh(v4, v3, v8);
+    renderer->addTriangleToMesh(v4, v8, v7);
 
-    //left
-    renderer->addTriangleToMesh(v1, v5, v8);
-    renderer->addTriangleToMesh(v1, v8, v4);
+    // Bottom
+    n = planes[0].getNormal();
+    v6 = static_cast<unsigned int>(renderer->addVertexToMesh(p6, n, color, bottomLeft));
+    v5 = static_cast<unsigned int>(renderer->addVertexToMesh(p5, n, color, bottomRight));
+    v2 = static_cast<unsigned int>(renderer->addVertexToMesh(p2, n, color, topRight));
+    v1 = static_cast<unsigned int>(renderer->addVertexToMesh(p1, n, color, topLeft));
+    renderer->addTriangleToMesh(v6, v5, v2);
+    renderer->addTriangleToMesh(v6, v2, v1);
 }
 
 void Frustum::render(MeshRenderer* renderer) {

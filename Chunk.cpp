@@ -17,13 +17,13 @@ void Chunk::initialize() {
 }
 
 void Chunk::generate(const FastNoiseLite& noise) {
-    for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int z = 0; z < CHUNK_SIZE; z++) {
+    for (int x = 0; x < ConfigHelper::CHUNK_SIZE; x++) {
+        for (int z = 0; z < ConfigHelper::CHUNK_SIZE; z++) {
             Vector3 globalPosition = chunkToWorldPosition(position);
 
-            float height = noise.GetNoise(globalPosition.x + x, globalPosition.z + z) * CHUNK_SIZE * 8;
+            float height = noise.GetNoise(globalPosition.x + x, globalPosition.z + z) * ConfigHelper::CHUNK_SIZE * 8;
 
-            for (int y = 0; y < CHUNK_SIZE; y++) {
+            for (int y = 0; y < ConfigHelper::CHUNK_SIZE; y++) {
                 if (globalPosition.y + y < 0) {
                     delete blocks[x][y][z];
                     blocks[x][y][z] = new BlockWater();
@@ -56,32 +56,32 @@ void Chunk::updateFullSides() {
         fullSides.insert(side);
     }
 
-    for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int y = 0; y < CHUNK_SIZE; y++) {
+    for (int x = 0; x < ConfigHelper::CHUNK_SIZE; x++) {
+        for (int y = 0; y < ConfigHelper::CHUNK_SIZE; y++) {
             if (!blocks[x][y][0]->isActive()) {
                 fullSides.erase(SOUTH);
             }
-            if (!blocks[x][y][CHUNK_SIZE - 1]->isActive()) {
+            if (!blocks[x][y][ConfigHelper::CHUNK_SIZE - 1]->isActive()) {
                 fullSides.erase(NORTH);
             }
         }
 
-        for (int z = 0; z < CHUNK_SIZE; z++) {
+        for (int z = 0; z < ConfigHelper::CHUNK_SIZE; z++) {
             if (!blocks[x][0][z]->isActive()) {
                 fullSides.erase(BOTTOM);
             }
-            if (!blocks[x][CHUNK_SIZE - 1][z]->isActive()) {
+            if (!blocks[x][ConfigHelper::CHUNK_SIZE - 1][z]->isActive()) {
                 fullSides.erase(TOP);
             }
         }
     }
 
-    for (int y = 0; y < CHUNK_SIZE; y++) {
-        for (int z = 0; z < CHUNK_SIZE; z++) {
+    for (int y = 0; y < ConfigHelper::CHUNK_SIZE; y++) {
+        for (int z = 0; z < ConfigHelper::CHUNK_SIZE; z++) {
             if (!blocks[0][y][z]->isActive()) {
                 fullSides.erase(EAST);
             }
-            if (!blocks[CHUNK_SIZE - 1][y][z]->isActive()) {
+            if (!blocks[ConfigHelper::CHUNK_SIZE - 1][y][z]->isActive()) {
                 fullSides.erase(WEST);
             }
         }
@@ -89,7 +89,7 @@ void Chunk::updateFullSides() {
 }
 
 Vector3i Chunk::worldToChunkPosition(const Vector3& position) {
-    Vector3 vec = (position / CHUNK_SIZE / Block::BLOCK_RENDER_SIZE);
+    Vector3 vec = (position / ConfigHelper::CHUNK_SIZE / Block::BLOCK_RENDER_SIZE);
     const int x = static_cast<int>(position.x > 0 ? vec.x : vec.x - 1);
     const int y = static_cast<int>(position.y > 0 ? vec.y : vec.y - 1);
     const int z = static_cast<int>(position.z > 0 ? vec.z : vec.z - 1);
@@ -98,7 +98,7 @@ Vector3i Chunk::worldToChunkPosition(const Vector3& position) {
 }
 
 Vector3 Chunk::chunkToWorldPosition(const Vector3i& position) {
-    return Vector3(static_cast<Vector3>(position) * CHUNK_SIZE * Block::BLOCK_RENDER_SIZE);
+    return Vector3(static_cast<Vector3>(position) * ConfigHelper::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE);
 }
 
 Vector3i Chunk::worldToBlockPosition(const Vector3& position) {
@@ -107,9 +107,9 @@ Vector3i Chunk::worldToBlockPosition(const Vector3& position) {
 
 Vector3i Chunk::worldPositionToLocalBlockOffset(const Vector3& position) {
     Vector3 result(
-        static_cast<int>(floorf(position.x / Block::BLOCK_RENDER_SIZE)) % CHUNK_SIZE,
-        static_cast<int>(floorf(position.y / Block::BLOCK_RENDER_SIZE)) % CHUNK_SIZE,
-        static_cast<int>(floorf(position.z / Block::BLOCK_RENDER_SIZE)) % CHUNK_SIZE
+        static_cast<int>(floorf(position.x / Block::BLOCK_RENDER_SIZE)) % ConfigHelper::CHUNK_SIZE,
+        static_cast<int>(floorf(position.y / Block::BLOCK_RENDER_SIZE)) % ConfigHelper::CHUNK_SIZE,
+        static_cast<int>(floorf(position.z / Block::BLOCK_RENDER_SIZE)) % ConfigHelper::CHUNK_SIZE
     );
 
     if (result.x < 0) {
@@ -206,6 +206,13 @@ void Chunk::render(ChunkRenderer* renderer) const {
 
 void Chunk::breakBlock(const Vector3i& position) {
     blocks[position.x][position.y][position.z]->setActive(false);
+
+    needsRebuild = true;
+}
+
+void Chunk::setBlock(const Vector3i& position, const Block& block) {
+    delete blocks[position.x][position.y][position.z];
+    blocks[position.x][position.y][position.z] = block.clone();
 
     needsRebuild = true;
 }

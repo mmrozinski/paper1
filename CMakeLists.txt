@@ -27,13 +27,29 @@ add_executable(paper1 main.cpp
         Plane.h
         Frustum.cpp
         Frustum.h
-        FastNoiseLite.h
+        extern/FastNoiseLite.h
         BlockStone.h
         BlockGrass.h
         BlockWater.h
         RayCaster.cpp
         RayCaster.h
+        TextureManager.cpp
+        TextureManager.h
+        ConfigHelper.h
+        ConfigLoader.h
+        ConfigLoader.cpp
 )
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/textures.png
+        ${CMAKE_CURRENT_BINARY_DIR}/textures.png
+        COPYONLY)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.txt
+        ${CMAKE_CURRENT_BINARY_DIR}/config.txt
+        COPYONLY)
+
+include_directories(${CMAKE_SOURCE_DIR}/../extern/stb_image)
+link_directories(${CMAKE_SOURCE_DIR}/../extern/stb_image)
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)

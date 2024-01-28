@@ -1,14 +1,19 @@
+#define STB_IMAGE_IMPLEMENTATION
+
+#include "extern/stb_image.h"
 #include <Windows.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+
 #include <iostream>
 
 #include "ChunkManager.h"
 
-int win_height = 600;
-int win_width = 800;
+int win_height = 720;
+int win_width = 1024;
 
-int tickDelay = 100;
+int tickDelay = 50;
+int subTickDelay = 1;
 
 int frame = 0, deltaTime, timebase = 0;
 int keyboardTime, keyboardTimebase = 0;
@@ -76,6 +81,14 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
         if (pKeyStruct->vkCode == 'R') {
             chunkManager->breakBlock(camera);
+        }
+
+        if (pKeyStruct->vkCode == 'E') {
+            chunkManager->placeBlock(camera);
+        }
+
+        if (pKeyStruct->vkCode == 'Q') {
+            chunkManager->pickBlock(camera);
         }
     }
     if (nCode >= 0 && wParam == WM_KEYUP || wParam == WM_SYSKEYUP) {
@@ -149,7 +162,7 @@ void handleUpdateSubTick(int) {
         );
 
     keyboardTimebase = keyboardTime;
-    glutTimerFunc(1, handleUpdateSubTick, 0);
+    glutTimerFunc(subTickDelay, handleUpdateSubTick, 0);
 }
 
 void handleMouseMove(int x, int y) {
@@ -185,7 +198,7 @@ void initGLUT(int *argc, char **argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
     glutInitWindowSize(win_width, win_height);
-    glutCreateWindow("nice squares");
+    glutCreateWindow("cubes");
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -194,12 +207,20 @@ void initGLUT(int *argc, char **argv) {
     glutPassiveMotionFunc(handleMouseMove);
     glutTimerFunc(1000 / fps_cap, timer, 0);
     glutTimerFunc(tickDelay, handleUpdateTick, 0);
-    glutTimerFunc(1, handleUpdateSubTick, 0);
+    glutTimerFunc(subTickDelay, handleUpdateSubTick, 0);
 
     keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, nullptr, 0);
     //mouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseProc, nullptr, 0);
 
     while(ShowCursor(false) >= 0);
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("textures.png", &width, &height, &nrChannels, 3);
+
+    TextureManager* textureManager = TextureManager::getInstance();
+    textureManager->setTextureImage(data, width, height, nrChannels);
+
+    stbi_image_free(data);
 }
 
 int main(int argc, char **argv) {

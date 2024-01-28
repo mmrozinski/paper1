@@ -1,5 +1,6 @@
 #include "ChunkManager.h"
 
+#include "BlockStone.h"
 #include "RayCaster.h"
 
 Chunk* ChunkManager::getChunk(const Vector3i&position) const {
@@ -36,10 +37,6 @@ void ChunkManager::prepareFlowLists(Chunk* chunk, const Vector3&position) {
     if (xDist > CHUNK_VISIBILITY_DISTANCE || yDist > CHUNK_VISIBILITY_DISTANCE || zDist >
         CHUNK_VISIBILITY_DISTANCE) {
         unloadList.insert(chunk);
-    }
-
-    if (chunk->isLoaded && chunk->isSetup && !chunk->shouldRender) {
-        flagsUpdateList.insert(chunk);
     }
 
     visibleList.insert(chunk);
@@ -135,17 +132,35 @@ void ChunkManager::optimizeForNeighbour(Chunk* chunk) const {
 ChunkManager::ChunkManager() {
     _renderer = new ChunkRenderer();
     _meshRenderer = new MeshRenderer();
+    configLoader = ConfigLoader::getInstance();
+    selectedBlock = new BlockStone();
+    selectedBlock->setActive(true);
 
-    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    CHUNK_VISIBILITY_DISTANCE = configLoader->getParameterInt("CHUNK_VISIBILITY_DISTANCE");
+    BREAK_RANGE = configLoader->getParameterFloat("BREAK_RANGE");
+
+    if (const int noiseType = configLoader->getParameterInt("NOISE_TYPE");
+        noiseType == 2) {
+        noise.SetNoiseType(FastNoiseLite::NoiseType_ValueCubic);
+    } else {
+        noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    }
+
     noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-    noise.SetSeed(static_cast<int>(time(nullptr)));
+
+    if (const int noiseSeed = configLoader->getParameterInt("NOISE_SEED");
+        noiseSeed == 0) {
+        noise.SetSeed(static_cast<int>(time(nullptr)));
+    } else {
+        noise.SetSeed(noiseSeed);
+    }
 }
 
 void ChunkManager::updateLoadList() {
     int chunksLoaded = 0;
     std::vector<std::future<void>> loadThreads;
     for (auto chunk: loadList) {
-        if (chunksLoaded >= CHUNKS_ASYNC_LIMIT_PER_FRAME) {
+        if (chunksLoaded >= ConfigHelper::CHUNKS_ASYNC_LIMIT_PER_FRAME) {
             break;
         }
 
@@ -181,7 +196,7 @@ void ChunkManager::updateRebuildList() {
 
     for (auto chunk: rebuildList) {
         if (chunk->isLoaded && chunk->isSetup) {
-            if (chunksRebuilt >= CHUNKS_ASYNC_LIMIT_PER_FRAME) {
+            if (chunksRebuilt >= ConfigHelper::CHUNKS_ASYNC_LIMIT_PER_FRAME) {
                 break;
             }
 
@@ -308,9 +323,9 @@ void ChunkManager::updateRenderList(const Camera&camera) {
     for (auto chunk: visibleList) {
         if (chunk->isLoaded && chunk->isSetup) {
             if (chunk->shouldRender) {
-                float offset = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
+                float offset = (ConfigHelper::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
                 Vector3 chunkCenter = Chunk::chunkToWorldPosition(chunk->position) + Vector3(offset, offset, offset);
-                float size = (Chunk::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
+                float size = (ConfigHelper::CHUNK_SIZE * Block::BLOCK_RENDER_SIZE) / 2.0f;
                 if (frustum.cubeInFrustum(chunkCenter, size, size, size) != Frustum::FRUSTUM_OUTSIDE) {
                     renderList.insert(chunk);
                 }
@@ -356,6 +371,7 @@ void ChunkManager::update(const Camera&camera, bool doListUpdates, bool doTickUp
 
 void ChunkManager::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     for (auto chunk: renderList) {
         chunk->render(_renderer);
     }
@@ -364,7 +380,7 @@ void ChunkManager::render() {
 }
 
 void ChunkManager::breakBlock(const Camera&camera) {
-    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition() + camera.getUp(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 1000);
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 100);
     for (auto intersection: lookRay.getIntersections()) {
         Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
 
@@ -385,10 +401,64 @@ void ChunkManager::breakBlock(const Camera&camera) {
     }
 }
 
+void ChunkManager::placeBlock(const Camera& camera) {
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 100);
+    auto intersections = lookRay.getIntersections();
+    for (int i = 0; i < intersections.size(); i++) {
+        auto intersection = intersections[i];
+        Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
+
+        if (Chunk* chunk = getChunk(chunkPosition); chunk != nullptr && chunk->isLoaded) {
+            if (const Vector3i blockLocalPos = Chunk::worldPositionToLocalBlockOffset(intersection);
+                chunk->blocks[blockLocalPos.x][blockLocalPos.y][blockLocalPos.z]->isActive()) {
+                if (i == 0) {
+                    break;
+                }
+                intersection = intersections[i - 1];
+
+                Vector3i placeChunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
+
+                if (Chunk* placeChunk = getChunk(placeChunkPosition); placeChunk != nullptr && placeChunk->isLoaded) {
+                    placeChunk->setBlock(Chunk::worldPositionToLocalBlockOffset(intersection), *selectedBlock);
+                    std::cout << "Placed block at: " << intersection.x << " " << intersection.y << " " << intersection.z <<
+                            std::endl;
+                    std::cout << "In chunk: " << placeChunkPosition.x << " " << placeChunkPosition.y << " " << placeChunkPosition.z <<
+                            std::endl;
+                    std::cout << "Locally: " << blockLocalPos.x << " " << blockLocalPos.y << " " << blockLocalPos.z <<
+                            std::endl;
+
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void ChunkManager::pickBlock(const Camera& camera) {
+    RayCaster::BlockRay lookRay = RayCaster::castRay(camera.getPosition(), camera.getPosition() + (camera.getFront() * BREAK_RANGE), 100);
+    for (auto intersection: lookRay.getIntersections()) {
+        Vector3i chunkPosition = Chunk::worldToChunkPosition(Vector3(intersection) + (Block::BLOCK_RENDER_SIZE / 2.0f));
+
+        if (Chunk* chunk = getChunk(chunkPosition); chunk != nullptr && chunk->isLoaded) {
+            if (const Vector3i blockLocalPos = Chunk::worldPositionToLocalBlockOffset(intersection);
+                chunk->blocks[blockLocalPos.x][blockLocalPos.y][blockLocalPos.z]->isActive()) {
+                delete selectedBlock;
+                selectedBlock = chunk->blocks[blockLocalPos.x][blockLocalPos.y][blockLocalPos.z]->clone();
+
+                break;
+            }
+        }
+    }
+}
+
 ChunkManager::~ChunkManager() {
     for (auto chunk: masterList) {
         delete chunk;
     }
     delete _renderer;
     delete _meshRenderer;
+
+    if (selectedBlock != nullptr) {
+        delete selectedBlock;
+    }
 }

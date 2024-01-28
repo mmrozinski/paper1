@@ -9,18 +9,20 @@
 
 #include "Camera.h"
 #include "Chunk.h"
+#include "ConfigLoader.h"
 #include "Frustum.h"
-#include "FastNoiseLite.h"
+#include "extern/FastNoiseLite.h"
 
 
 class ChunkManager {
 private:
-    const int CHUNKS_ASYNC_LIMIT_PER_FRAME = 1024;
-    const int CHUNK_VISIBILITY_DISTANCE = 4;
+    int CHUNK_VISIBILITY_DISTANCE;
+    float BREAK_RANGE;
 
-    const int WORLD_SIZE = 1;
+    ConfigLoader* configLoader;
 
-    const float BREAK_RANGE = 5.0f;
+    Block* selectedBlock;
+
     std::set<Chunk*> masterList = std::set<Chunk*>();
 
     std::set<Chunk*> loadList = std::set<Chunk*>();
@@ -60,6 +62,8 @@ public:
     void render();
 
     void breakBlock(const Camera& camera);
+    void placeBlock(const Camera& camera);
+    void pickBlock(const Camera& camera);
 
     ~ChunkManager();
 };

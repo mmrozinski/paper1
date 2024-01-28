@@ -28,7 +28,7 @@ public:
 
     void initGLObjects();
 
-    int addVertexToMesh(const Vector3& position, const Vector3& normal, const Vector3& color);
+    int addVertexToMesh(const Vector3& position, const Vector3& normal, const Vector3& color, const Vector3& texturePos);
     void addTriangleToMesh(unsigned int v1, unsigned int v2, unsigned int v3);
 
     void setProjectionMatrix(const Matrix4& matrix);
